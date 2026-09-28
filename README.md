@@ -11,6 +11,11 @@ TO RUN THE WEB, go to TERMINAL and paste this:
 
 then, paste http://localhost:8080 in your browser and u should see the web.
 
+OR
+
+go to NegosyoproApplication.java and click the 'Run' above the public static void main and then go to http://localhost:8080
+refresh the browser to see changes.
+
 
 MVC FRAMEWORK:
 1. MODEL:
