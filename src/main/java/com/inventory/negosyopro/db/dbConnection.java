@@ -9,7 +9,7 @@ public class dbConnection {
     private static final String USER = "inventory";
     private static final String PASSWORD = "OopInventorySystem";
 
-    public static Connection dbConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }

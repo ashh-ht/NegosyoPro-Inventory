@@ -22,7 +22,7 @@ public class HomeController {
     @GetMapping("/db-test")
     @ResponseBody
     public String dbTest() {
-        try (Connection conn = dbConnection.dbConnection()) {
+        try (Connection conn = dbConnection.getConnection()) {
             return "Connected to " + conn.getCatalog();
         } catch (SQLException e) {
             return "Failed: " + e.getMessage();
