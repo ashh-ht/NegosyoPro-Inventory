@@ -97,9 +97,7 @@ public class BusinessDAO {
             pstmt.setBigDecimal(13, business.getOrderingCost());
             pstmt.setBigDecimal(14, business.getHoldingCost());
             pstmt.setLong(15, business.getBusinessId());
-
-            int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -115,9 +113,7 @@ public class BusinessDAO {
             pstmt.setLong(2, businessId);
             pstmt.setBoolean(3, usesExpiry);
             pstmt.setBoolean(4, usesPurchaseOrders);
-
-            int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+            return pstmt.executeUpdate()> 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
