@@ -124,5 +124,62 @@ public class Business {
     
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }                               
+    }
+    
+    //setter
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+
+    public void setBusinessAddress(String businessAddress) {
+        this.businessAddress = businessAddress;
+    }
+
+    public void setBusinessContact(String businessContact) {
+        this.businessContact = businessContact;
+    }
+
+    public void setTaxEnabled(boolean isTaxEnabled) {
+        this.isTaxEnabled = isTaxEnabled;
+    }
+
+    public void setTaxInclusive(boolean isTaxInclusive) {
+        this.isTaxInclusive = isTaxInclusive;
+    }
+
+    public void setTaxRate(BigDecimal taxRate) {
+        this.taxRate = taxRate;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
+
+    public void setCurrencySymbol(String currencySymbol) {
+        this.currencySymbol = currencySymbol;
+    }
+
+    public void setReceiptFooter(String receiptFooter) {
+        this.receiptFooter = receiptFooter;
+    }
+
+    public void setUsesExpiry(boolean isUsesExpiry) {
+        this.isUsesExpiry = isUsesExpiry;
+    }
+
+    public void setUsesPurchaseOrders(boolean v) {
+        this.isUsesPurchaseOrders = v;
+    }
+
+    public void setExpiryAlertDays(int expiryAlertDays) {
+        this.expiryAlertDays = expiryAlertDays;
+    }
+
+    public void setOrderingCost(BigDecimal orderingCost) {
+        this.orderingCost = orderingCost;
+    }
+
+    public void setHoldingCost(BigDecimal holdingCost) {
+        this.holdingCost = holdingCost;
+    }
 }

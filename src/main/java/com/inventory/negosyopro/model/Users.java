@@ -65,4 +65,12 @@ public class Users {
         return isOwner;
     }
 
+    public void setBusinessId(long businessId) {
+        this.businessId = businessId;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
 }

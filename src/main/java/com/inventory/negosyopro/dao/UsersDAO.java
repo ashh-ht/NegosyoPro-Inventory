@@ -79,7 +79,7 @@ public class UsersDAO {
         List<Users> users = new ArrayList<>();
         String sql = "SELECT user_id, business_id, username, password_hash, first_name, last_name, "
                 + "role, is_owner, is_active FROM users WHERE business_id = ?"
-                + "ORDER BY is_owner DESC, first_name";
+                + " ORDER BY is_owner DESC, first_name";
         try (Connection conn = dbConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, businessId);

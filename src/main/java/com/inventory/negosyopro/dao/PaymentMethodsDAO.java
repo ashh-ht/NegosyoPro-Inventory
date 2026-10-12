@@ -66,7 +66,7 @@ public class PaymentMethodsDAO {
 
     // used for listing methods. NOTE: pass TRUE in pos checkout and FALSE in
     // settings page.
-    public List<PaymentMethods> getPaymentMethodsByBusinessId(long businessId, boolean onlyActive) {
+    public List<PaymentMethods> getPaymentMethodsByBusiness(long businessId, boolean onlyActive) {
         String sql = "SELECT * FROM payment_methods WHERE business_id = ?"
                 + (onlyActive ? " AND is_active = TRUE" : "") + " ORDER BY payment_method_id";
         List<PaymentMethods> paymentMethods = new ArrayList<>();

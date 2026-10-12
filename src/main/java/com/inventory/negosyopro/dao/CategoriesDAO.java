@@ -60,7 +60,7 @@ public class CategoriesDAO {
     //used for getting all categories
     public List<Categories> getCategoriesByBusiness(long businessId, boolean onlyActive) {
         String sql = "SELECT * FROM categories WHERE business_id = ?"
-                + (onlyActive ? " AND is_active = TRUE" : "") + "ORDER BY categories_id";
+                + (onlyActive ? " AND is_active = TRUE" : "") + " ORDER BY category_id";
         List<Categories> categories = new ArrayList<>();
         try (Connection conn = dbConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {

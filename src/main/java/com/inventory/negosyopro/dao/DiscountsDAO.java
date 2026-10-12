@@ -10,7 +10,7 @@ public class DiscountsDAO {
     // will be called in settim=ngs for adding discounts in db
     public long insertDiscount(Connection conn, Discounts discount) throws SQLException {
         String sql = "INSERT INTO discounts (business_id, discount_name, discount_percent, requires_id, is_active) VALUES (?,?,?,?,?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setLong(1, discount.getBusinessId());
             pstmt.setString(2, discount.getDiscountName());
             pstmt.setBigDecimal(3, discount.getDiscountPercent());
@@ -54,13 +54,13 @@ public class DiscountsDAO {
     }
 
     // setting discount active/inactive
-    public boolean setDiscountActive(long businesId, boolean isActive, long discountId) {
+    public boolean setDiscountActive(long discountId, long businessId, boolean isActive) {
         String sql = "UPDATE discounts SET is_active = ? WHERE discount_id = ? AND business_id =?";
         try (Connection conn = dbConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setBoolean(1, isActive);
             pstmt.setLong(2, discountId);
-            pstmt.setLong(3, businesId);
+            pstmt.setLong(3, businessId);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,7 +68,7 @@ public class DiscountsDAO {
         }
     }
 
-    public List<Discounts> getDiscountsByBusinessId(long businessId, boolean onlyActive) {
+    public List<Discounts> getDiscountsByBusiness(long businessId, boolean onlyActive) {
         String sql = "SELECT * FROM discounts WHERE business_id = ?"
                 + (onlyActive ? " AND is_active = TRUE" : "") + " ORDER BY discount_id";
         List<Discounts> discounts = new ArrayList<>();

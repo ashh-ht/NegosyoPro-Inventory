@@ -82,21 +82,22 @@ public class BusinessDAO {
 
         try (Connection conn = dbConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, business.getBusinessName());
-            pstmt.setString(2, business.getBusinessAddress());
-            pstmt.setString(3, business.getBusinessContact());
-            pstmt.setBoolean(4, business.isTaxEnabled());
-            pstmt.setBoolean(5, business.isTaxInclusive());
-            pstmt.setBigDecimal(6, business.getTaxRate());
-            pstmt.setString(7, business.getCurrencyCode());
-            pstmt.setString(8, business.getCurrencySymbol());
-            pstmt.setString(9, business.getReceiptFooter());
-            pstmt.setBoolean(10, business.isUsesExpiry());
-            pstmt.setBoolean(11, business.isUsesPurchaseOrders());
-            pstmt.setInt(12, business.getExpiryAlertDays());
-            pstmt.setBigDecimal(13, business.getOrderingCost());
-            pstmt.setBigDecimal(14, business.getHoldingCost());
-            pstmt.setLong(15, business.getBusinessId());
+                    pstmt.setLong(1, business.getTemplateId());
+            pstmt.setString(2, business.getBusinessName());
+            pstmt.setString(3, business.getBusinessAddress());
+            pstmt.setString(4, business.getBusinessContact());
+            pstmt.setBoolean(5, business.isTaxEnabled());
+            pstmt.setBoolean(6, business.isTaxInclusive());
+            pstmt.setBigDecimal(7, business.getTaxRate());
+            pstmt.setString(8, business.getCurrencyCode());
+            pstmt.setString(9, business.getCurrencySymbol());
+            pstmt.setString(10, business.getReceiptFooter());
+            pstmt.setBoolean(11, business.isUsesExpiry());
+            pstmt.setBoolean(12, business.isUsesPurchaseOrders());
+            pstmt.setInt(13, business.getExpiryAlertDays());
+            pstmt.setBigDecimal(14, business.getOrderingCost());
+            pstmt.setBigDecimal(15, business.getHoldingCost());
+            pstmt.setLong(16, business.getBusinessId());
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

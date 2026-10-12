@@ -189,7 +189,7 @@ public class ProductsDAO {
         return products;
     }
 
-    public List<Products> searchProduct(long businessId, String text) {
+    public List<Products> searchProducts(long businessId, String text) {
         if (text == null)
             text = "";
         String sql = "SELECT * FROM products WHERE business_id = ? AND is_active = 1 AND (product_name LIKE ? OR product_code LIKE ?) ORDER BY product_name LIMIT 50";
@@ -216,7 +216,7 @@ public class ProductsDAO {
     public List<Products> getLowStockProducts(long businessId) {
         String sql = "SELECT * FROM products WHERE business_id = ? AND track_inventory = 1 AND is_active = 1"
                 + " AND current_stock <= reorder_level "
-                + "ORDER BY (current_stock - reorder_level), product_name";
+                + "ORDER BY CAST(current_stock AS SIGNED) - CAST(reorder_level AS SIGNED), product_name";
         List<Products> products = new ArrayList<>();
 
         try (Connection conn = dbConnection.getConnection();
@@ -236,17 +236,35 @@ public class ProductsDAO {
     // called inside transactions: receiving(add), sales(minus), adjustment(+/-)
     public boolean updateCurrentStock(Connection conn, long productId, long businessId, int addedStock)
             throws SQLException {
-        String sql = "UPDATE products SET current_stock + ? WHERE product_id = ? AND business_id = ? AND current_stock + ? >= 0";
+        String sql = "UPDATE products SET current_stock = current_stock + ? WHERE product_id = ? AND business_id = ? AND current_stock + ? >= 0";
+        
+        //adding stock
+        if (addedStock >= 0) {
+            sql = "UPDATE products " +
+                    "SET current_stock = current_stock + ? " +
+                    "WHERE product_id = ? AND business_id = ?";
+        } else {    //removing stock
+            sql = "UPDATE products " +
+                    "SET current_stock = current_stock - ? " +
+                    "WHERE product_id = ? AND business_id = ? " +
+                    "AND current_stock >= ?";
+        }
+
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, addedStock);
+
+            pstmt.setLong(1, Math.abs((long) addedStock));
             pstmt.setLong(2, productId);
             pstmt.setLong(3, businessId);
-            pstmt.setInt(4, addedStock);
+
+            if (addedStock < 0) {
+                pstmt.setLong(4, Math.abs((long) addedStock));
+            }
+
             return pstmt.executeUpdate() > 0;
         }
     }
 
-    public boolean updateReorderSettings(long businessId, long productId, int reorderQuantity, int reorderLevel) {
+    public boolean updateReorderSettings(long productId, long businessId, int reorderLevel, int reorderQuantity) {
         String sql = "UPDATE products SET reorder_level = ?, reorder_quantity = ?"
                 + " WHERE business_id = ? AND product_id = ?";
 
