@@ -1,0 +1,151 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f6f9;
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 260px;
+    background-color: #152b47; 
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    font-size: 22px;
+    font-weight: bold;
+    padding: 30px 25px;
+}
+
+.nav-menu {
+    list-style: none;
+    flex-grow: 1;
+}
+
+.nav-menu li {
+    padding: 0;
+}
+
+.nav-menu li a {
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 15px 25px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.nav-menu li.active {
+    background-color: #1e3a5f; 
+}
+
+.sidebar-footer {
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.logout-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.brand-text {
+    color: #8fa1b8;
+}
+
+/* Main Content Styles */
+.main-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #f4f6f9;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.top-header h1 {
+    color: #000000;
+    font-size: 30px;
+}
+
+.user-profile {
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.new-sales-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    width: max-content;
+    margin-bottom: 30px;
+}
+
+.view-inventory {
+    margin-top: 15px;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    width: max-content;
+    margin-bottom: 30px;
+}
+
+.stats-grid {
+    margin-top: 15px;
+    display: flex;
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e7ec;
+    border-radius: 8px;
+    padding: 25px 20px;
+    flex: 1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.stat-title {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.stat-value {
+    color: #1f2937;
+    font-size: 26px;
+}
