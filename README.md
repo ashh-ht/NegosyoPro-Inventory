@@ -35,3 +35,9 @@ MVC FRAMEWORK:
 3. CONTROLLER
     -u should see the controller' folder inside src/main/java/com/inventory/negosyopro.
     -thats where all of the controller will be placed.
+
+com.inventory.negosyopro
+├── db        → dbConnection.java 
+├── model     → Business.java, Template.java, User.java, Product.java ...(data classes only)
+├── dao       → BusinessDAO.java, TemplateDAO.java, UserDAO.java ... (SQL only)
+└── service   → SetupService.java, SalesService.java ... 
