@@ -14,7 +14,6 @@ body {
     height: 100vh;
 }
 
-/* Sidebar Styles */
 .sidebar {
     width: 260px;
     background-color: #152b47; 
@@ -69,13 +68,13 @@ body {
     color: #8fa1b8;
 }
 
-/* Main Content Styles */
 .main-content {
     flex-grow: 1;
     padding: 40px;
     background-color: #f4f6f9;
     display: flex;
     flex-direction: column;
+    overflow-y: auto; 
 }
 
 .top-header {
@@ -148,4 +147,211 @@ body {
 .stat-value {
     color: #1f2937;
     font-size: 26px;
+}
+
+.action-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    align-items: center;
+}
+
+.input-field {
+    padding: 10px 15px;
+    border: 1px solid #e2e7ec;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    background-color: #edf1f4;
+    min-width: 200px;
+}
+
+.input-field.bg-white {
+    background-color: #ffffff;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background-color: #6b7280;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-small {
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: 4px;
+    border: 1px solid #e2e7ec;
+    background: #edf1f4;
+    cursor: pointer;
+    color: #1f2937;
+}
+
+.btn-small.primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+}
+
+.tabs-container {
+    display: flex;
+    gap: 20px;
+    border-bottom: 3px solid #152b47;
+    margin-bottom: 25px;
+    align-items: flex-end;
+}
+
+.tab {
+    font-size: 16px;
+    font-weight: bold;
+    color: #152b47;
+    cursor: pointer;
+    padding: 8px 15px;
+    border-radius: 4px 4px 0 0;
+}
+
+.tab.active {
+    background-color: #152b47;
+    color: #ffffff;
+}
+
+.data-table-wrapper {
+    background: #ffffff;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 15px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.data-table th {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: normal;
+}
+
+.data-table td {
+    border-bottom: 1px solid #e2e7ec;
+    color: #1f2937;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.status-green { color: #10b981; }
+.status-orange { color: #f59e0b; }
+
+.form-section {
+    margin-bottom: 35px;
+}
+
+.form-section h2 {
+    font-size: 18px;
+    color: #000000;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    max-width: 500px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #1f2937;
+}
+
+.form-group input {
+    padding: 12px;
+    border: 1px solid #e2e7ec;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #ffffff;
+    outline: none;
+}
+
+.form-group input:disabled {
+    background-color: #edf1f4;
+    color: #9ca3af;
+}
+
+.summary-box {
+    background: #ffffff;
+    border: 1px solid #e2e7ec;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-box h4 {
+    font-size: 12px;
+    margin-bottom: 10px;
+    color: #1f2937;
+}
+
+.summary-box p {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 15px;
+}
+
+.ai-container {
+    background: #ffffff;
+    border: 1px solid #e2e7ec;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 25px;
+}
+
+.ai-container h3 {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 15px;
+}
+
+.ai-textbox {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 15px;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-footer {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 15px;
 }

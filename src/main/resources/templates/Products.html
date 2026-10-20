@@ -34,6 +34,66 @@
                 </div>
             </div>
             
+            <div class="action-bar">
+                <input type="text" class="input-field" placeholder="Search">
+                <select class="input-field">
+                    <option>Category</option>
+                </select>
+                <button class="btn-primary">+ Add Product</button>
+                <button class="btn-primary">Manage Categories</button>
+            </div>
+
+            <div class="tabs-container">
+                <div class="tab active">All</div>
+                <div class="tab">Low</div>
+                <div class="tab">Out</div>
+                <div class="tab">Expiring</div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>P001</td>
+                            <td>Item name</td>
+                            <td>Category</td>
+                            <td>0.00</td>
+                            <td>12</td>
+                            <td class="status-green">In stock</td>
+                            <td>
+                                <button class="btn-small">Edit</button>
+                                <button class="btn-small">Stock</button>
+                                <button class="btn-small">History</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>P002</td>
+                            <td>Item name</td>
+                            <td>Category</td>
+                            <td>0.00</td>
+                            <td>2</td>
+                            <td class="status-orange">Low</td>
+                            <td>
+                                <button class="btn-small">Edit</button>
+                                <button class="btn-small">Stock</button>
+                                <button class="btn-small">History</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 </body>
