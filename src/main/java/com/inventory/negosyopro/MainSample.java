@@ -9,13 +9,7 @@ import com.inventory.negosyopro.db.dbConnection;
 import com.inventory.negosyopro.model.*;
 import com.inventory.negosyopro.services.PasswordUtil;
 
-/**
- * Terminal test for the DONE items in the Backend Checklist.
- * Before running: run Part 1 of negosyopro_seed_data.sql once (templates +
- * keywords).
- * Each section runs on its own, so one failure does not stop the others.
- * Re-runnable: it creates a new business with a unique username every time.
- */
+//terminal testing for the done functions
 public class MainSample {
 
     // ---------- tiny test helpers ----------
@@ -70,8 +64,6 @@ public class MainSample {
         } catch (Exception e) {
             System.out.println("\nCANNOT REACH THE DATABASE - test stopped.");
             System.out.println("  1. Open Laragon and click Start All (MySQL must be running).");
-            System.out.println("  2. Check the host, port and database name in dbConnection.java.");
-            System.out.println("  3. Make sure the tables exist and Part 1 of the seed SQL was run.");
             System.out.println("  Reason: " + e.getMessage().split("\n")[0]);
             return;
         }

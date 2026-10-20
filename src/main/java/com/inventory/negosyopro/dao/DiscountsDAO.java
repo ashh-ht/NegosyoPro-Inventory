@@ -25,7 +25,7 @@ public class DiscountsDAO {
                 throw new SQLException("Insert succeeded but no discount_id was returned.");
             }
         }
-    }
+    }  
 
     // called in setupService
     public void insertDefaults(Connection conn, long businessId) throws SQLException {
