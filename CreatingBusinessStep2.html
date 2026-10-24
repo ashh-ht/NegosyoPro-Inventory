@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NegosyoPro Create Business Step 2</title>
-    <link rel="stylesheet" href="BusinessCSS.css">
+    <link rel="stylesheet" href="BusinessCSS.css" th:href="@{/BusinessCSS.css}">
 </head>
 <body>
     <div class="main-wrapper">
         
         <div class="header">
-            <h1>NegosyoPro - <span id="business-name-display">Business Name</span></h1>
+            <h1>NegosyoPro - <span id="business-name-display" th:text="${businessName}">Business Name</span></h1>
             <p>Setup Your Business</p>
         </div>
 
@@ -58,7 +58,7 @@
                     </div>
                     <p>Products, POS, suppliers, purchase orders, restock suggestions.</p>
                     <p>Keywords: retail, clothing, gadgets, hardware</p>
-                    <a href="#" class="card-link">Select</a>
+                    <a href="#" th:href="@{/select-template/retail}" class="card-link">Select</a>
                 </div>
 
                 <div class="card">
@@ -73,7 +73,7 @@
                     </div>
                     <p>Everything in Retail, plus expiry dates, batches and the Expiring tab.</p>
                     <p>Keywords: grocery, food, bakery, café, pharmacy</p>
-                    <a href="#" class="card-link">Select</a>
+                    <a href="#" th:href="@{/select-template/food}" class="card-link">Select</a>
                 </div>
 
                 <div class="card">
@@ -88,17 +88,17 @@
                     </div>
                     <p>POS, products and suppliers. No expiry and no purchase orders.</p>
                     <p>Keywords: salon, barbershop, spa, repair</p>
-                    <a href="#" class="card-link">Select</a>
+                    <a href="#" th:href="@{/select-template/salon}" class="card-link">Select</a>
                 </div>
             </div>
 
             <div class="section-title">Do your products expire?</div>
             <div class="radio-group">
                 <label class="radio-box">
-                    <input type="radio" name="expire" value="yes"> Yes
+                    <input type="radio" name="expire" value="yes" th:checked="${expire == 'yes'}"> Yes
                 </label>
                 <label class="radio-box">
-                    <input type="radio" name="expire" value="no"> No
+                    <input type="radio" name="expire" value="no" th:checked="${expire == 'no'}"> No
                 </label>
             </div>
 
