@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NegosyoPro Create Business Step 3</title>
-    <link rel="stylesheet" href="BusinessCSS.css">
+    <link rel="stylesheet" href="BusinessCSS.css" th:href="@{/BusinessCSS.css}">
 </head>
 <body>
     <div class="main-wrapper">
         
         <div class="header">
-            <h1>NegosyoPro - <span id="business-name-display">Business Name</span></h1>
+            <h1>NegosyoPro - <span id="business-name-display" th:text="${businessName}">Business Name</span></h1>
             <p>Setup Your Business</p>
         </div>
 
@@ -28,34 +28,34 @@
                 <h3>VAT</h3>
                 <div class="radio-group">
                     <label class="radio-box">
-                        <input type="radio" name="vat" value="on"> On
+                        <input type="radio" name="vat" value="on" th:checked="${vat == 'on'}"> On
                     </label>
                     <label class="radio-box">
-                        <input type="radio" name="vat" value="off"> Off
+                        <input type="radio" name="vat" value="off" th:checked="${vat == 'off'}"> Off
                     </label>
                 </div>
             </div>
 
             <div class="form-section">
                 <h3>VAT rate</h3>
-                <input type="text" class="input-field">
+                <input type="text" class="input-field" th:value="${vatRate}">
             </div>
 
             <div class="form-section">
                 <h3>Prices include VAT?</h3>
                 <div class="radio-group">
                     <label class="radio-box">
-                        <input type="radio" name="vat-included" value="yes"> Yes
+                        <input type="radio" name="vat-included" value="yes" th:checked="${vatIncluded == 'yes'}"> Yes
                     </label>
                     <label class="radio-box">
-                        <input type="radio" name="vat-included" value="no"> No
+                        <input type="radio" name="vat-included" value="no" th:checked="${vatIncluded == 'no'}"> No
                     </label>
                 </div>
             </div>
 
             <div class="form-section">
                 <h3>Currency</h3>
-                <input type="text" class="input-field">
+                <input type="text" class="input-field" th:value="${currency}">
             </div>
 
             <div class="button-group">
