@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NegosyoPro Reports - Transactions</title>
+    <link rel="stylesheet" href="DashboardCSS.css" th:href="@{/DashboardCSS.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a href="#" th:href="@{/products}">Products</a></li>
+                <li><a href="#" th:href="@{/sales}">Sales/POS</a></li>
+                <li><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
+                <li class="active"><a href="#" th:href="@{/reports}">Reports</a></li>
+                <li><a href="#" th:href="@{/settings}">Settings</a></li>
+                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
+                <span class="brand-text">NegosyoPro</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h1>Reports</h1>
+                <div class="user-profile">
+                    <span class="user-icon">(Icon Here)</span> Owner
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab">Sales</div>
+                <div class="tab">Revenue</div>
+                <div class="tab">Inventory</div>
+                <div class="tab active">Transactions</div>
+            </div>
+
+            <div class="action-bar">
+                <select class="input-field">
+                    <option th:each="date : ${fromDates}" th:value="${date}" th:text="${date}">From date</option>
+                </select>
+                <select class="input-field">
+                    <option th:each="date : ${toDates}" th:value="${date}" th:text="${date}">To date</option>
+                </select>
+                <button class="btn-primary">Apply</button>
+            </div>
+
+            <div class="action-bar">
+                <input type="text" class="input-field" placeholder="Search order number" th:value="${searchOrderNumber}">
+                <select class="input-field">
+                    <option th:each="status : ${statusOptions}" th:value="${status}" th:text="${status}">Status</option>
+                </select>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Cashier</th>
+                            <th>Payment</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="tx : ${transactionReports}">
+                            <td th:text="${tx.orderNumber}">#####</td>
+                            <td th:text="${tx.customer}">Walk-in</td>
+                            <td th:text="${tx.cashier}">Name</td>
+                            <td th:text="${tx.payment}">Cash</td>
+                            <td th:text="${tx.total}">#</td>
+                            <td class="status-green" th:text="${tx.status}">Completed</td>
+                            <td><button class="btn-small">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>#####</td>
+                            <td>Name</td>
+                            <td>Name</td>
+                            <td>E-wallet</td>
+                            <td>#</td>
+                            <td class="status-red">Cancelled</td>
+                            <td><button class="btn-small">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>#####</td>
+                            <td>Name</td>
+                            <td>Name</td>
+                            <td>Cash</td>
+                            <td>#</td>
+                            <td class="status-orange">Refunded</td>
+                            <td><button class="btn-small">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ai-container">
+                <h3>AI Summary</h3>
+                <div class="ai-textbox" th:text="${aiSummary}">
+                    AI SUMMARY INFO HERE MWEHEHEHE
+                </div>
+                <div class="ai-footer" th:text="'Last generated: ' + ${lastGeneratedDate}">Last generated: MM/DD/YYYY</div>
+                <button class="btn-primary">Generate Summary</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

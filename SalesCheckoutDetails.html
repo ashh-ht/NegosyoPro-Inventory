@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NegosyoPro Sales/POS - Checkout Details</title>
+    <link rel="stylesheet" href="DashboardCSS.css" th:href="@{/DashboardCSS.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a href="#" th:href="@{/products}">Products</a></li>
+                <li class="active"><a href="#" th:href="@{/sales}">Sales/POS</a></li>
+                <li><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
+                <li><a href="#" th:href="@{/reports}">Reports</a></li>
+                <li><a href="#" th:href="@{/settings}">Settings</a></li>
+                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
+                <span class="brand-text">NegosyoPro</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h1>Sales/POS</h1>
+                <div class="user-profile">
+                    <span class="user-icon">(Icon Here)</span> Owner
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab">New Sale</div>
+                <div class="tab active">Checkout Details</div>
+                <div class="tab">Transactions</div>
+            </div>
+
+            <div class="checkout-summary-box" th:text="'ITEMS : ' + ${itemsCount} + ' · DISCOUNT : ' + ${discountAmount} + ' · TOTAL : ' + ${totalAmount}">
+                ITEMS &middot; DISCOUNT &middot; TOTAL
+            </div>
+
+            <form action="#" th:action="@{/sales/checkout}">
+                <div class="form-group">
+                    <label>Customer Name <span class="optional-text">(optional)</span></label>
+                    <input type="text" th:value="${customerName}">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Information <span class="optional-text">(optional)</span></label>
+                    <input type="text" th:value="${contactInformation}">
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Method <span>&#709;</span></label>
+                    <input type="text" th:value="${paymentMethod}">
+                </div>
+
+                <div class="form-group">
+                    <label>Amount Paid</label>
+                    <input type="text" th:value="${amountPaid}">
+                </div>
+
+                <div class="change-text" th:text="'CHANGE : ' + ${changeAmount}">CHANGE : PHP 0.00</div>
+                <p class="stock-note">Stock is deducted automatically, earliest expiry first.</p>
+
+                <div class="action-bar">
+                    <button type="button" class="btn-secondary">CANCEL</button>
+                    <button type="submit" class="btn-primary">COMPLETE</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</body>
+</html>
