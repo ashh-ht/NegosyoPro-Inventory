@@ -7,7 +7,7 @@ import java.util.List;
 import com.inventory.negosyopro.dao.*;
 import com.inventory.negosyopro.db.dbConnection;
 import com.inventory.negosyopro.model.*;
-import com.inventory.negosyopro.services.PasswordUtil;
+import com.inventory.negosyopro.service.PasswordUtil;
 
 //terminal testing for the done functions
 public class MainSample {

@@ -31,7 +31,7 @@ public class DiscountsDAO {
     public void insertDefaults(Connection conn, long businessId) throws SQLException {
         String[] defaultDiscounts = { "Senior Citizen", "PWD" };
         for (String discountName : defaultDiscounts) {
-            Discounts discount = new Discounts(0, businessId, discountName, BigDecimal.ZERO, true, true);
+            Discounts discount = new Discounts(0, businessId, discountName, new BigDecimal("20.00"), true, true);
             insertDiscount(conn, discount);
         }
     }

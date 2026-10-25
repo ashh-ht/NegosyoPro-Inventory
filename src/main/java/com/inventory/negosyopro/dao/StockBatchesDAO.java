@@ -51,7 +51,8 @@ public class StockBatchesDAO {
     }
 
     public List<StockBatches> getBatchesFEFO(Connection conn, long productId) throws SQLException {
-        String sql = "SELECT * FROM stock_batches WHERE product_id = ? ORDER BY expiration_date ASC LIMIT 1";
+        String sql = "SELECT * FROM stock_batches WHERE product_id = ? AND quantity_remaining > 0 "
+                + "ORDER BY expiration_date IS NULL, expiration_date ASC, batch_id ASC FOR UPDATE";
         List<StockBatches> batch = new ArrayList<>();
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -67,7 +68,8 @@ public class StockBatchesDAO {
 
     //for getting and displaying expired batches
     public List<StockBatches> getExpiredBatches(long businessId) {
-        String sql = "SELECT * FROM stock_batches WHERE expiration_date < CURDATE() AND business_id = ?";
+        String sql = "SELECT * FROM stock_batches WHERE expiration_date < CURDATE() AND quantity_remaining > 0 "
+                + "AND business_id = ? ORDER BY expiration_date ASC";
         List<StockBatches> batches = new ArrayList<>();
 
         try (Connection conn = dbConnection.getConnection();
@@ -83,6 +85,21 @@ public class StockBatchesDAO {
             e.printStackTrace();
         }
         return batches;
+    }
+
+    // One batch, read on the transaction's connection and locked (used by cancelSale and writeOffExpired).
+    public StockBatches getBatchById(Connection conn, long batchId, long businessId) throws SQLException {
+        String sql = "SELECT * FROM stock_batches WHERE batch_id = ? AND business_id = ? FOR UPDATE";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, batchId);
+            pstmt.setLong(2, businessId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapBatches(rs);
+                }
+            }
+        }
+        return null;
     }
 
     public List<StockBatches> getExpiringBatches(long businessId, int alertDays) {

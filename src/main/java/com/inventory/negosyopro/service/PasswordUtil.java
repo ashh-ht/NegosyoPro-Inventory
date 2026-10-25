@@ -1,4 +1,4 @@
-package com.inventory.negosyopro.services;
+package com.inventory.negosyopro.service;
 
 import org.mindrot.jbcrypt.BCrypt;
 

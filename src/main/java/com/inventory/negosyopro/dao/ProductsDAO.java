@@ -56,7 +56,10 @@ public class ProductsDAO {
             pstmt.setBoolean(7, p.isTaxable());
             pstmt.setBoolean(8, p.isTrackInventory());
             pstmt.setBoolean(9, p.isTracksExpiry());
-            pstmt.setInt(10, p.getShelfLifeDays());
+            if (p.getShelfLifeDays() == null)
+                pstmt.setNull(10, Types.SMALLINT);
+            else
+                pstmt.setInt(10, p.getShelfLifeDays());
             pstmt.setInt(11, p.getReorderLevel());
             pstmt.setInt(12, p.getReorderQuantity());
             pstmt.setLong(13, p.getProductId());
@@ -122,6 +125,22 @@ public class ProductsDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Used inside a transaction (sales, stock changes): reads the product on the SAME
+    // connection and locks the row (FOR UPDATE), so two checkouts cannot both spend the
+    // same stock and current_stock is always the up-to-date value.
+    public Products getProductForUpdate(Connection conn, long productId, long businessId) throws SQLException {
+        String sql = "SELECT * FROM products WHERE product_id = ? AND business_id = ? FOR UPDATE";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, productId);
+            pstmt.setLong(2, businessId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next())
+                    return mapProduct(rs);
+            }
         }
         return null;
     }

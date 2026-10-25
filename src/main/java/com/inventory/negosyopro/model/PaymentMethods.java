@@ -1,3 +1,4 @@
+
 package com.inventory.negosyopro.model;
 
 public class PaymentMethods {

@@ -8,16 +8,15 @@ import com.inventory.negosyopro.model.ProductSuppliers;
 public class ProductSuppliersDAO {
     public long insertProductSupplier(Connection conn, ProductSuppliers ps) throws SQLException {
         String sql = "INSERT INTO product_suppliers (product_id, supplier_id, "
-                + "supplier_product_code, supplier_cost, lead_time_days, is_preffered "
-                + "VALUES (?,?,?,?,?,?)";
+                + "supplier_product_code, supplier_cost, lead_time_days) "
+                + "VALUES (?,?,?,?,?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setLong(1, ps.getProductId());
             pstmt.setLong(2, ps.getSupplierId());
             pstmt.setString(3, ps.getSupplierProductCode());
             pstmt.setBigDecimal(4, ps.getSupplierCost());
-            pstmt.setInt(5, ps.getLeadTimeDays());
-            pstmt.setBoolean(6, ps.isPreferred());
+            pstmt.setObject(5, ps.getLeadTimeDays());
             pstmt.executeUpdate();
 
             try (ResultSet keys = pstmt.getGeneratedKeys()) {
@@ -59,11 +58,11 @@ public class ProductSuppliersDAO {
                 rs.getLong("supplier_id"),
                 rs.getString("supplier_product_code"),
                 rs.getBigDecimal("supplier_cost"),
-                rs.getInt("lead_tiime_days"),
+                rs.getObject("lead_time_days", Integer.class),
                 rs.getBoolean("is_preferred"));
     }
 
-    //only one supplier for one product. setting one as preferred will clear other supplier in that certain product
+    // only one preferred supplier for one product. setting one as preferred will clear other supplier in that certain product
     public boolean setPreferredSupplier(long productId, long supplierId, long businessId, boolean isPreferred) {
         String clearSql = "UPDATE product_suppliers ps "
                 + "JOIN products p ON p.product_id = ps.product_id "
@@ -110,4 +109,70 @@ public class ProductSuppliersDAO {
             return false;
         }
     }
+
+    /// getting the supppliers of one product
+    public List<ProductSuppliers> getSuppliersForProduct(long productId, long businessId) {
+        String sql = "SELECT ps.* FROM product_suppliers ps "
+                + "JOIN products p ON p.product_id = ps.product_id "
+                + "WHERE ps.product_id = ? AND p.business_id = ?";
+        List<ProductSuppliers> pSuppliers = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, productId);
+            pstmt.setLong(2, businessId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    pSuppliers.add(mapProductSuppliers(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pSuppliers;
+    }
+
+    // getting the products of one supplier
+    public List<ProductSuppliers> getProductsForSupplier(long supplierId, long businessId) {
+    String sql = "SELECT ps.* FROM product_suppliers ps "
+               + "JOIN suppliers s ON s.supplier_id = ps.supplier_id "
+               + "WHERE ps.supplier_id = ? AND s.business_id = ?";
+        List<ProductSuppliers> pSuppliers = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, supplierId);
+            pstmt.setLong(2, businessId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    pSuppliers.add(mapProductSuppliers(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pSuppliers;
+    }
+
+    public ProductSuppliers getPreferredSupplier(long productId, long businessId) {
+        String sql = "SELECT ps.* FROM product_suppliers ps "
+                + "JOIN products p ON p.product_id = ps.product_id "
+                + "WHERE ps.product_id = ? AND ps.is_preferred = 1 AND p.business_id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, productId);
+            pstmt.setLong(2, businessId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapProductSuppliers(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+        return null;
+    }
+
 }

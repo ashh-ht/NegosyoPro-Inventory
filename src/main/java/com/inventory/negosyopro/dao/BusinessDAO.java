@@ -111,10 +111,10 @@ public class BusinessDAO {
         try (Connection conn = dbConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, templateId);
-            pstmt.setLong(2, businessId);
-            pstmt.setBoolean(3, usesExpiry);
-            pstmt.setBoolean(4, usesPurchaseOrders);
-            return pstmt.executeUpdate()> 0;
+            pstmt.setBoolean(2, usesExpiry);
+            pstmt.setBoolean(3, usesPurchaseOrders);
+            pstmt.setLong(4, businessId);
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
