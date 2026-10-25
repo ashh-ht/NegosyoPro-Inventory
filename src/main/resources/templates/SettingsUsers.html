@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NegosyoPro Settings - Users</title>
+    <link rel="stylesheet" href="../static/css/DashboardCSS.css" th:href="@{/css/DashboardCSS.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a href="#" th:href="@{/products}">Products</a></li>
+                <li><a href="#" th:href="@{/sales}">Sales/POS</a></li>
+                <li><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
+                <li><a href="#" th:href="@{/reports}">Reports</a></li>
+                <li class="active"><a href="#" th:href="@{/settings}">Settings</a></li>
+                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
+                <span class="brand-text">NegosyoPro</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h1>Settings</h1>
+                <div class="user-profile">
+                    <span class="user-icon">(Icon Here)</span> Owner
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab">Basic Info</div>
+                <div class="tab">Tax &amp; Currency</div>
+                <div class="tab">Payment Methods</div>
+                <div class="tab">Discounts</div>
+                <div class="tab">Inventory</div>
+                <div class="tab active">Users</div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-primary">Add User</button>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td th:text="${ownerName}">Owner Name</td>
+                            <td th:text="${ownerUsername}">owner</td>
+                            <td>Owner</td>
+                            <td>Active</td>
+                            <td>Protected: cannot be deactivated</td>
+                        </tr>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.name}">Employee 1</td>
+                            <td th:text="${user.username}">emp1</td>
+                            <td th:text="${user.role}">Admin</td>
+                            <td th:text="${user.status}">Active</td>
+                            <td>
+                                <button class="btn-small primary">Deactivate</button>
+                                <button class="btn-small primary">Reset Password</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Employee 2</td>
+                            <td>emp2</td>
+                            <td>Employee</td>
+                            <td>Active</td>
+                            <td>
+                                <button class="btn-small primary">Deactivate</button>
+                                <button class="btn-small primary">Reset Password</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

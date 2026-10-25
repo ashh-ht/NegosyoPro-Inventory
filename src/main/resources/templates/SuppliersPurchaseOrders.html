@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NegosyoPro Suppliers - Purchase Orders</title>
+    <link rel="stylesheet" href="../static/css/DashboardCSS.css" th:href="@{/css/DashboardCSS.css}}">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a href="#" th:href="@{/products}">Products</a></li>
+                <li><a href="#" th:href="@{/sales}">Sales/POS</a></li>
+                <li class="active"><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
+                <li><a href="#" th:href="@{/reports}">Reports</a></li>
+                <li><a href="#" th:href="@{/settings}">Settings</a></li>
+                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
+                <span class="brand-text">NegosyoPro</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h1>Suppliers</h1>
+                <div class="user-profile">
+                    <span class="user-icon">(Icon Here)</span> Owner
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab">Suppliers</div>
+                <div class="tab active">Purchase Orders</div>
+                <div class="tab">Restock Suggestions</div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-primary">Create Purchase Order</button>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PO #</th>
+                            <th>Supplier</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="po : ${purchaseOrders}">
+                            <td th:text="${po.poNumber}">PO-###</td>
+                            <td th:text="${po.supplier}">Name</td>
+                            <td th:text="${po.date}">MM/DD</td>
+                            <td th:text="${po.status}">Draft</td>
+                            <td><button class="btn-small">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>PO-###</td>
+                            <td>Name</td>
+                            <td>MM/DD</td>
+                            <td>Ordered</td>
+                            <td><button class="btn-small">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>PO-###</td>
+                            <td>Name</td>
+                            <td>MM/DD</td>
+                            <td>Received</td>
+                            <td><button class="btn-small">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

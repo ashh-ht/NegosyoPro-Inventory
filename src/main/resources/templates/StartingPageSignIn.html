@@ -1,35 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NegosyoPro Sign In</title>
-    <link rel="stylesheet" href="../static/css/StartingPageCSS.css">
+    <link rel="stylesheet" href="../static/css/StartingPageCSS.css" th:href="@{/css/StartingPageCSS.css}">
 </head>
+
 <body>
     <div class="main-container">
         <div class="left-panel-SignIn">
             <h2>Sign In</h2>
-            <form action="#">
+            <form action="#" th:action="@{/signin}">
                 <div class="input-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username">
+                    <input type="text" id="username" name="username" th:value="${username}">
                 </div>
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password">
+                    <input type="password" id="password" name="password" th:value="${password}">
                 </div>
-                <button type="submit" class="create-btn">Sign In</button>
+                <button type="button" class="create-btn" onclick="location.href='/dashboard'">Sign In</button>
             </form>
         </div>
         <div class="right-panel-SignIn">
             <h2>Welcome Back to NegosyoPro!</h2>
             <p>Do not have an account yet?</p>
-            <button class="sign-in-btn">Create Account</button>
+            <button type="button" class="sign-in-btn" onclick="location.href='/'">Create Account</button>
         </div>
 
-        
+
 
     </div>
 </body>
+
 </html>

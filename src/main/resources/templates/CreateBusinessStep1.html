@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NegosyoPro Create Business Step 1</title>
-    <link rel="stylesheet" href="../static/css/BusinessCSS.css">
+    <link rel="stylesheet" href="../static/css/BusinessCSS.css" th:href="@{/css/BusinessCSS.css}">
 </head>
 <body>
     <div class="main-wrapper">
@@ -24,25 +24,26 @@
         </div>
 
         <div class="form-card">
-            <form action="#">
+            <form action="#" th:action="@{/create-business/step1}">
                 <div class="input-group">
                     <label for="business-name">Business Name</label>
-                    <input type="text" id="business-name" name="business-name">
+                    <input type="text" id="business-name" name="business-name" th:value="${businessName}">
                 </div>
                 
                 <div class="input-group">
                     <label for="address">Address</label>
-                    <input type="text" id="address" name="address">
+                    <input type="text" id="address" name="address" th:value="${address}">
                 </div>
                 
                 <div class="input-group">
                     <label for="contact-number">Contact Number</label>
-                    <input type="text" id="contact-number" name="contact-number">
+                    <input type="text" id="contact-number" name="contact-number" th:value="${contactNumber}">
                 </div>
                 
                 <div class="button-group">
-                    <button type="submit" class="next-btn">Next</button>
+                    <button type="button" class="next-btn" onclick="location.href='/create-business/step2'">Next</button>
                 </div>
+                <!-- type="submit" change the type="button" to this kapag icoconnect n sa backend -->
             </form>
         </div>
 

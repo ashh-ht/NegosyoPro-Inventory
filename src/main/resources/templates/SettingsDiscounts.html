@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NegosyoPro Settings - Discounts</title>
+    <link rel="stylesheet" href="../static/css/DashboardCSS.css" th:href="@{/css/DashboardCSS.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a href="#" th:href="@{/products}">Products</a></li>
+                <li><a href="#" th:href="@{/sales}">Sales/POS</a></li>
+                <li><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
+                <li><a href="#" th:href="@{/reports}">Reports</a></li>
+                <li class="active"><a href="#" th:href="@{/settings}">Settings</a></li>
+                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
+                <span class="brand-text">NegosyoPro</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h1>Settings</h1>
+                <div class="user-profile">
+                    <span class="user-icon">(Icon Here)</span> Owner
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab">Basic Info</div>
+                <div class="tab">Tax &amp; Currency</div>
+                <div class="tab">Payment Methods</div>
+                <div class="tab active">Discounts</div>
+                <div class="tab">Inventory</div>
+                <div class="tab">Users</div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Discount</th>
+                            <th>Percentage</th>
+                            <th>Requires ID?</th>
+                            <th>Requires ID?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="discount : ${discounts}">
+                            <td th:text="${discount.name}">Senior</td>
+                            <td th:text="${discount.percentage}">20%</td>
+                            <td th:text="${discount.requiresId}">Yes</td>
+                            <td>
+                                <label class="radio-pill">
+                                    <input type="radio" th:name="${discount.name}" value="on" checked th:checked="${discount.enabled}"> ON
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Promo</td>
+                            <td>10%</td>
+                            <td>No</td>
+                            <td>
+                                <label class="radio-pill">
+                                    <input type="radio" name="promo" value="off"> OFF
+                                </label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-primary">Add Discount</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NegosyoPro Products - Expiring</title>
+    <link rel="stylesheet" href="../static/css/DashboardCSS.css" th:href="@{/css/DashboardCSS.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
+                <li class="active"><a href="#" th:href="@{/products}">Products</a></li>
+                <li><a href="#" th:href="@{/sales}">Sales/POS</a></li>
+                <li><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
+                <li><a href="#" th:href="@{/reports}">Reports</a></li>
+                <li><a href="#" th:href="@{/settings}">Settings</a></li>
+                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
+                <span class="brand-text">NegosyoPro</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h1>Products</h1>
+                <div class="user-profile">
+                    <span class="user-icon">(Icon Here)</span> Owner
+                </div>
+            </div>
+            
+            <div class="action-bar">
+                <input type="text" class="input-field" placeholder="Search" th:value="${searchQuery}">
+                <select class="input-field">
+                    <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}">Category</option>
+                </select>
+                <button class="btn-primary">+ Add Product</button>
+                <button class="btn-primary">Manage Categories</button>
+            </div>
+
+            <div class="tabs-container">
+                <div class="tab">All</div>
+                <div class="tab">Low</div>
+                <div class="tab">Out</div>
+                <div class="tab active">Expiring</div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Batch</th>
+                            <th>Qty left</th>
+                            <th>Expiry</th>
+                            <th>Days left</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${expiringProducts}">
+                            <td th:text="${item.productName}">Item name</td>
+                            <td th:text="${item.batch}">B-##</td>
+                            <td th:text="${item.qtyLeft}">#</td>
+                            <td th:text="${item.expiry}">MM/DD/YYYY</td>
+                            <td th:text="${item.daysLeft}">#</td>
+                            <td>
+                                <button class="btn-small">Write off</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

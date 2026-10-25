@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NegosyoPro Settings - Tax &amp; Currency</title>
+    <link rel="stylesheet" href="../static/css/DashboardCSS.css" th:href="@{/css/DashboardCSS.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
+                <li><a href="#" th:href="@{/products}">Products</a></li>
+                <li><a href="#" th:href="@{/sales}">Sales/POS</a></li>
+                <li><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
+                <li><a href="#" th:href="@{/reports}">Reports</a></li>
+                <li class="active"><a href="#" th:href="@{/settings}">Settings</a></li>
+                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
+                <span class="brand-text">NegosyoPro</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h1>Settings</h1>
+                <div class="user-profile">
+                    <span class="user-icon">(Icon Here)</span> Owner
+                </div>
+            </div>
+            
+            <div class="tabs-container">
+                <div class="tab">Basic Info</div>
+                <div class="tab active">Tax &amp; Currency</div>
+                <div class="tab">Payment Methods</div>
+                <div class="tab">Discounts</div>
+                <div class="tab">Inventory</div>
+                <div class="tab">Users</div>
+            </div>
+
+            <form action="#" th:action="@{/settings/tax-currency}">
+                <div class="form-group">
+                    <label>VAT</label>
+                    <div class="radio-pill-group">
+                        <label class="radio-pill">
+                            <input type="radio" name="vat" value="on" checked th:checked="${vat == 'on'}"> ON
+                        </label>
+                        <label class="radio-pill">
+                            <input type="radio" name="vat" value="off" th:checked="${vat == 'off'}"> OFF
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>VAT Rates</label>
+                    <input type="text" th:value="${vatRates}">
+                </div>
+
+                <div class="form-group currency-group">
+                    <label>Currency &nbsp;&nbsp;&nbsp;&nbsp; <span class="currency-toggle" onclick="toggleCurrencyMenu()">&#709;</span></label>
+                    <div class="currency-dropdown" id="currencyMenu">
+                        <div class="currency-option" th:each="curr : ${currencies}" th:text="${curr}" onclick="selectCurrency(this.textContent)">PHP</div>
+                        <div class="currency-option" onclick="selectCurrency(this.textContent)">USD</div>
+                        <div class="currency-option" onclick="selectCurrency(this.textContent)">EUR</div>
+                        <div class="currency-option" onclick="selectCurrency(this.textContent)">JPY</div>
+                    </div>
+                    <input type="text" id="currencyInput" name="currency" th:value="${currency}">
+                </div>
+
+                <div class="form-group">
+                    <label>Prices Include VAT?</label>
+                    <div class="radio-pill-group">
+                        <label class="radio-pill">
+                            <input type="radio" name="pricesIncludeVat" value="on" th:checked="${pricesIncludeVat == 'on'}"> ON
+                        </label>
+                        <label class="radio-pill">
+                            <input type="radio" name="pricesIncludeVat" value="off" th:checked="${pricesIncludeVat == 'off'}"> OFF
+                        </label>
+                    </div>
+                </div>
+
+                <div class="save-right-wrapper">
+                    <button type="submit" class="btn-primary">SAVE</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleCurrencyMenu() {
+            document.getElementById('currencyMenu').classList.toggle('show');
+        }
+
+        function selectCurrency(value) {
+            document.getElementById('currencyInput').value = value;
+            document.getElementById('currencyMenu').classList.remove('show');
+        }
+
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.currency-group')) {
+                document.getElementById('currencyMenu').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
