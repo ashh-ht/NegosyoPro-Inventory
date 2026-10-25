@@ -355,3 +355,107 @@ body {
     color: #6b7280;
     margin-bottom: 15px;
 }
+
+.status-red { color: #ef4444; }
+
+.optional-text {
+    color: #6b7280;
+    font-weight: normal;
+}
+
+.checkout-summary-box {
+    background: #ffffff;
+    border: 1px solid #e2e7ec;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.change-text {
+    font-size: 12px;
+    font-weight: bold;
+    color: #1f2937;
+    margin-top: 5px;
+    margin-bottom: 4px;
+}
+
+.stock-note {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+.radio-pill-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.radio-pill {
+    background-color: #2563eb;
+    color: #ffffff !important;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    margin-bottom: 0 !important;
+}
+
+.save-right-wrapper {
+    max-width: 500px;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.currency-group {
+    position: relative;
+}
+
+.currency-toggle {
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    padding: 0 4px;
+}
+
+.currency-dropdown {
+    display: none;
+    position: absolute;
+    top: 22px;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #e2e7ec;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+    overflow: hidden;
+}
+
+.currency-dropdown.show {
+    display: block;
+}
+
+.currency-option {
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #1f2937;
+    cursor: pointer;
+    border-bottom: 1px solid #e2e7ec;
+}
+
+.currency-option:last-child {
+    border-bottom: none;
+}
+
+.currency-option:hover {
+    background-color: #edf1f4;
+}
