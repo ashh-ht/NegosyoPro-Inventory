@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NegosyoPro Employee Products - Low</title>
+    <link rel="stylesheet" href="DashboardCSS.css" th:href="@{/DashboardCSS.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
+            <ul class="nav-menu">
+                <li><a href="#" th:href="@{/employee/dashboard}">Dashboard</a></li>
+                <li class="active"><a href="#" th:href="@{/employee/products}">Products</a></li>
+                <li><a href="#" th:href="@{/employee/sales}">Sales/POS</a></li>
+                <li><a href="#" th:href="@{/employee/my-account}">My Account</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
+                <span class="brand-text">NegosyoPro</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-header">
+                <h1>Products</h1>
+                <div class="user-profile">
+                    <span class="user-icon">(Icon Here)</span> Employee
+                </div>
+            </div>
+            
+            <div class="action-bar">
+                <input type="text" class="input-field bg-white" placeholder="Search" th:value="${searchQuery}">
+                <input type="text" class="input-field bg-white" placeholder="Category" th:value="${categoryQuery}">
+            </div>
+
+            <div class="tabs-container">
+                <div class="tab">All</div>
+                <div class="tab active">Low</div>
+                <div class="tab">Out</div>
+                <div class="tab">Expiring</div>
+            </div>
+
+            <div class="data-table-wrapper emp-table-wrapper">
+                <table class="data-table emp-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${lowProducts}">
+                            <td th:text="${product.code}">P###</td>
+                            <td th:text="${product.name}">Sample Item Name</td>
+                            <td th:text="${product.category}">Sample Category</td>
+                            <td th:text="${product.price}">PHP 0.00</td>
+                            <td th:text="${product.stock}">##</td>
+                            <td th:text="${product.status}">IN STOCK</td>
+                            <td th:text="${product.action}">NONE</td>
+                        </tr>
+                        <tr>
+                            <td>P###</td>
+                            <td>Sample Item Name</td>
+                            <td>Sample Category</td>
+                            <td>PHP 0.00</td>
+                            <td>##</td>
+                            <td>LOW</td>
+                            <td>RESTOCK</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

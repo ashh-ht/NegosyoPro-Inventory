@@ -1,0 +1,127 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+body {
+    background-color: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.main-container {
+    display: flex;
+    width: 900px;
+    height: 600px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.left-panel-SignUp {
+    background-color: #1a7a6b;
+    color: #ffffff;
+    width: 45%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.left-panel-SignUp h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+.left-panel-SignUp p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+.sign-in-btn {
+    background-color: #3cdbc0;
+    color: #12564a;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 150px;
+}
+.right-panel-SignUp {
+    width: 55%;
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.right-panel-SignUp h2 {
+    color: #242f3d;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+}
+.left-panel-SignIn {
+    width: 55%;
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.left-panel-SignIn h2 {
+    color: #242f3d;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+}
+.right-panel-SignIn {
+    background-color: #1a7a6b;
+    color: #ffffff;
+    width: 45%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.right-panel-SignIn h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+.right-panel-SignIn p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.input-group label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #242f3d;
+    margin-bottom: 5px;
+}
+.input-group input {
+    padding: 12px;
+    border: none;
+    background-color: #edf1f4;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+.create-btn {
+    background-color: #1a7a6b;
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    width: 160px;
+    margin: 20px auto 0;
+    display: block;
+}
