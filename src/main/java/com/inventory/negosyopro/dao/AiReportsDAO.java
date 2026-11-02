@@ -35,7 +35,7 @@ public class AiReportsDAO {
     // again.
     public AiReports getLatestAiReport(long businessId, String reportType) {
         String sql = "SELECT * FROM ai_reports WHERE business_id = ? AND report_type = ? "
-                + "ORDER BY created_at DESC, ai_report_id DESC LIMIT 1";
+                + "ORDER BY generated_at DESC, ai_report_id DESC LIMIT 1";
 
         try (Connection conn = dbConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
