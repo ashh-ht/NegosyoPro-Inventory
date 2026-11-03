@@ -264,6 +264,7 @@ body {
 
 .status-green { color: #10b981; }
 .status-orange { color: #f59e0b; }
+.status-red { color: #ef4444; }
 
 .form-section {
     margin-bottom: 35px;
@@ -355,8 +356,6 @@ body {
     color: #6b7280;
     margin-bottom: 15px;
 }
-
-.status-red { color: #ef4444; }
 
 .optional-text {
     color: #6b7280;
@@ -458,4 +457,54 @@ body {
 
 .currency-option:hover {
     background-color: #edf1f4;
+    
+}
+.emp-card {
+    min-height: 140px;
+}
+
+.stat-card.graph-wide {
+    flex: 2;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.graph-placeholder {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8fa1b8;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.emp-table-wrapper {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.emp-table {
+    flex-grow: 1;
+    height: 100%;
+}
+
+.emp-table th,
+.emp-table td {
+    border-right: 1px solid #2563eb;
+    border-bottom: none;
+    padding: 6px 15px;
+    font-weight: bold;
+    vertical-align: top;
+}
+
+.emp-table th:last-child,
+.emp-table td:last-child {
+    border-right: none;
+}
+
+.emp-table tbody tr:last-child td {
+    height: 100%;
 }
