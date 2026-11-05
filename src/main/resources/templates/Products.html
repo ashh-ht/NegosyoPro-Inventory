@@ -1,100 +1,96 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NegosyoPro Products</title>
-    <link rel="stylesheet" href="../static/css/DashboardCSS.css" th:href="@{/css/DashboardCSS.css}">
+    <th:block th:replace="~{fragments/layout :: head('Products')}"></th:block>
 </head>
 <body>
-    <div class="dashboard-container">
-        
-        <div class="sidebar">
-            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
-            <ul class="nav-menu">
-                <li><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
-                <li class="active"><a href="#" th:href="@{/products}">Products</a></li>
-                <li><a href="#" th:href="@{/sales}">Sales/POS</a></li>
-                <li><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
-                <li><a href="#" th:href="@{/reports}">Reports</a></li>
-                <li><a href="#" th:href="@{/settings}">Settings</a></li>
-                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
-            </ul>
-            <div class="sidebar-footer">
-                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
-                <span class="brand-text">NegosyoPro</span>
-            </div>
-        </div>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('products')}"></div>
 
-        <div class="main-content">
-            <div class="top-header">
-                <h1>Products</h1>
-                <div class="user-profile">
-                    <span class="user-icon">(Icon Here)</span> Owner
-                </div>
-            </div>
-            
-            <div class="action-bar">
-                <input type="text" class="input-field" placeholder="Search" th:value="${searchQuery}">
-                <select class="input-field">
-                    <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}">Category</option>
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Products')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="toolbar">
+            <!-- GET /products?q=...&categoryId=...  (the controller searches by text first, then by category) -->
+            <form th:action="@{/products}" method="get">
+                <input type="text" class="input-field bg-white" name="q" th:value="${q}" placeholder="Search name or code">
+                <select class="input-field bg-white" name="categoryId">
+                    <option value="">All categories</option>
+                    <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.categoryName}"
+                            th:selected="${selectedCategoryId != null and selectedCategoryId == c.categoryId}">Category</option>
                 </select>
-                <button class="btn-primary">+ Add Product</button>
-                <button class="btn-primary">Manage Categories</button>
-            </div>
-
-            <div class="tabs-container">
-                <div class="tab active">All</div>
-                <div class="tab">Low</div>
-                <div class="tab">Out</div>
-                <div class="tab">Expiring</div>
-            </div>
-
-            <div class="data-table-wrapper">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="product : ${products}">
-                            <td th:text="${product.code}">P001</td>
-                            <td th:text="${product.name}">Item name</td>
-                            <td th:text="${product.category}">Category</td>
-                            <td th:text="${product.price}">0.00</td>
-                            <td th:text="${product.stock}">12</td>
-                            <td class="status-green" th:text="${product.status}">In stock</td>
-                            <td>
-                                <button class="btn-small">Edit</button>
-                                <button class="btn-small">Stock</button>
-                                <button class="btn-small">History</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>P002</td>
-                            <td>Item name</td>
-                            <td>Category</td>
-                            <td>0.00</td>
-                            <td>2</td>
-                            <td class="status-orange">Low</td>
-                            <td>
-                                <button class="btn-small">Edit</button>
-                                <button class="btn-small">Stock</button>
-                                <button class="btn-small">History</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
+                <button type="submit" class="btn-secondary">Filter</button>
+                <a th:href="@{/products}" class="btn-small">Clear</a>
+            </form>
+            <span class="spacer"></span>
+            <th:block th:if="${me.role.name() == 'ADMIN'}">
+                <a th:href="@{/admin/products/new}" class="btn-primary">+ Add product</a>
+                <a th:href="@{/admin/categories}" class="btn-secondary">Categories</a>
+                <a th:href="@{/admin/inventory}" class="btn-secondary">Inventory</a>
+            </th:block>
         </div>
+
+        <div class="tabs-container" data-tabs>
+            <button type="button" class="tab" data-target="all">All</button>
+            <button type="button" class="tab" data-target="low">Low stock</button>
+            <button type="button" class="tab" data-target="out">Out of stock</button>
+        </div>
+
+        <div class="data-table-wrapper">
+            <table class="data-table" id="productTable">
+                <thead>
+                <tr>
+                    <th>Code</th><th>Name</th><th>Category</th><th class="num">Price</th><th class="num">Stock</th><th>Status</th>
+                    <th th:if="${me.role.name() == 'ADMIN'}">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${products}"
+                    th:with="status=${!p.trackInventory ? 'na' : (p.currentStock == 0 ? 'out' : (p.currentStock <= p.reorderLevel ? 'low' : 'ok'))}"
+                    th:attr="data-status=${status}">
+                    <td th:text="${p.productCode}">P001</td>
+                    <td th:text="${p.productName}">Item</td>
+                    <td th:text="${categories.^[categoryId == __${p.categoryId}__]?.categoryName} ?: '-'">Category</td>
+                    <td class="num"><span th:replace="~{fragments/layout :: money(${p.sellingPrice})}">0.00</span></td>
+                    <td class="num" th:text="${p.trackInventory ? p.currentStock + ' ' + p.unit : '-'}">12</td>
+                    <td>
+                        <span class="badge green" th:if="${status == 'ok'}">In stock</span>
+                        <span class="badge orange" th:if="${status == 'low'}">Low</span>
+                        <span class="badge red" th:if="${status == 'out'}">Out</span>
+                        <span class="badge" th:if="${status == 'na'}">Not tracked</span>
+                    </td>
+                    <td th:if="${me.role.name() == 'ADMIN'}">
+                        <a th:href="@{/admin/products/{id}/edit(id=${p.productId})}" class="btn-small">Edit</a>
+                        <a th:if="${p.trackInventory}" th:href="@{/admin/inventory/{id}(id=${p.productId})}" class="btn-small">Stock</a>
+                        <form class="inline-form" th:action="@{/admin/products/{id}/active(id=${p.productId})}" method="post"
+                              onsubmit="return confirm('Deactivate this product? It will no longer be sold.')">
+                            <input type="hidden" name="active" value="false">
+                            <button type="submit" class="btn-small">Deactivate</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${#lists.isEmpty(products)}">No products found.</div>
+        </div>
+        <p class="muted">Expired and expiring batches are on the <a th:if="${me.role.name() == 'ADMIN'}" th:href="@{/admin/inventory}">Inventory</a><span th:unless="${me.role.name() == 'ADMIN'}">Inventory</span> page (admins).</p>
     </div>
+</div>
+
+<script th:src="@{/js/charts.js}"></script>
+<script>
+    // The tab buttons (charts.js) only mark the active tab; this hides the rows that do not match.
+    document.addEventListener('DOMContentLoaded', function () {
+        var tabs = document.querySelectorAll('[data-tabs] .tab');
+        function filter(which) {
+            document.querySelectorAll('#productTable tbody tr').forEach(function (row) {
+                var s = row.dataset.status;
+                row.style.display = (which === 'all' || (which === 'low' && (s === 'low' || s === 'out')) || (which === 'out' && s === 'out')) ? '' : 'none';
+            });
+        }
+        tabs.forEach(function (t) { t.addEventListener('click', function () { filter(t.dataset.target); }); });
+    });
+</script>
 </body>
 </html>

@@ -65,7 +65,7 @@ public class PurchaseOrderAdminController {
 
     // ?status=DRAFT|ORDERED|RECEIVED|CANCELLED, or no status for all
     @GetMapping
-    public String list(@RequestParam(required = false) PurchaseOrders.Status status,
+    public String list(@RequestParam(value = "status", required = false) PurchaseOrders.Status status,
             HttpSession session, Model model) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         model.addAttribute("orders", purchaseOrdersDAO.getPurchaseOrders(bid, status));
@@ -84,12 +84,12 @@ public class PurchaseOrderAdminController {
     }
 
     @PostMapping
-    public String create(@RequestParam long supplierId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expectedArrival,
-            @RequestParam(required = false) String notes,
-            @RequestParam(required = false) List<Long> productId,
-            @RequestParam(required = false) List<Integer> quantity,
-            @RequestParam(required = false) List<BigDecimal> unitCost,
+    public String create(@RequestParam(value = "supplierId") long supplierId,
+            @RequestParam(value = "expectedArrival", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expectedArrival,
+            @RequestParam(value = "notes", required = false) String notes,
+            @RequestParam(value = "productId", required = false) List<Long> productId,
+            @RequestParam(value = "quantity", required = false) List<Integer> quantity,
+            @RequestParam(value = "unitCost", required = false) List<BigDecimal> unitCost,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         Users user = CurrentUser.get(session);
 
@@ -122,7 +122,7 @@ public class PurchaseOrderAdminController {
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable long id, HttpSession session, Model model) {
+    public String detail(@PathVariable("id") long id, HttpSession session, Model model) {
         long bid = CurrentUser.get(session).getBusinessId();
         PurchaseOrders po = purchaseOrdersDAO.getPurchaseOrderById(id, bid);
         if (po == null) {
@@ -137,7 +137,7 @@ public class PurchaseOrderAdminController {
 
     // markOrdered and cancelPurchaseOrder take the BUSINESS id.
     @PostMapping("/{id}/order")
-    public String markOrdered(@PathVariable long id, HttpSession session, RedirectAttributes flash)
+    public String markOrdered(@PathVariable("id") long id, HttpSession session, RedirectAttributes flash)
             throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -151,7 +151,7 @@ public class PurchaseOrderAdminController {
     }
 
     @PostMapping("/{id}/cancel")
-    public String cancel(@PathVariable long id, HttpSession session, RedirectAttributes flash)
+    public String cancel(@PathVariable("id") long id, HttpSession session, RedirectAttributes flash)
             throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -166,10 +166,10 @@ public class PurchaseOrderAdminController {
     // receivePurchaseOrder takes the USER id. Only an ORDERED order can be
     // received.
     @PostMapping("/{id}/receive")
-    public String receive(@PathVariable long id,
-            @RequestParam(required = false) List<Long> itemId,
-            @RequestParam(required = false) List<Integer> qtyReceived,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) List<LocalDate> expirationDate,
+    public String receive(@PathVariable("id") long id,
+            @RequestParam(value = "itemId", required = false) List<Long> itemId,
+            @RequestParam(value = "qtyReceived", required = false) List<Integer> qtyReceived,
+            @RequestParam(value = "expirationDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) List<LocalDate> expirationDate,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         Users user = CurrentUser.get(session);
 

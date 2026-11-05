@@ -26,10 +26,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password,
+    public String login(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
             HttpSession session, RedirectAttributes flash) {
 
-        Users user = authService.login(username, password); // keep the result
+        Users user;
+        try {
+            user = authService.login(username, password); // keep the result
+        } catch (IllegalStateException e) { // correct password, but the account is deactivated
+            flash.addFlashAttribute("error", e.getMessage());
+            return "redirect:/login";
+        }
 
         if (user != null) {
             session.setAttribute("currentUser", user); // semicolon

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Purchase order')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('orders')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead(${'Purchase order ' + order.poNumber})}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="card">
+            <p>
+                <b>Status:</b>
+                <span class="badge" th:classappend="${order.status.name() == 'RECEIVED'} ? 'green' : (${order.status.name() == 'ORDERED'} ? 'blue' : (${order.status.name() == 'CANCELLED'} ? 'red' : ''))"
+                      th:text="${order.status.name()}">DRAFT</span>
+            </p>
+            <p><b>Supplier:</b> <span th:text="${supplier != null ? supplier.supplierName : 'Supplier #' + order.supplierId}">Supplier</span></p>
+            <p><b>Ordered:</b> <span th:text="${order.orderedAt != null ? #temporals.format(order.orderedAt, 'yyyy-MM-dd') : '-'}">-</span></p>
+            <p><b>Expected arrival:</b> <span th:text="${order.expectedArrival != null ? #temporals.format(order.expectedArrival, 'yyyy-MM-dd') : '-'}">-</span></p>
+            <p th:if="${order.receivedAt != null}"><b>Received:</b> <span th:text="${#temporals.format(order.receivedAt, 'yyyy-MM-dd HH:mm')}">-</span></p>
+            <p th:if="${order.notes != null and !#strings.isEmpty(order.notes)}"><b>Notes:</b> <span th:text="${order.notes}">notes</span></p>
+        </div>
+
+        <!-- ORDERED: one form so itemId, qtyReceived and expirationDate stay in step (one of each per line).
+             The controller skips lines where qtyReceived is blank or 0. -->
+        <form th:action="@{/admin/purchase-orders/{id}/receive(id=${order.purchaseOrderId})}" method="post"
+              th:with="canReceive=${order.status.name() == 'ORDERED'}">
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>Product</th><th class="num">Ordered</th><th class="num">Received so far</th><th class="num">Unit cost</th>
+                        <th th:if="${canReceive}">Receive now</th>
+                        <th th:if="${canReceive and business.usesExpiry}">Expiry date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="i : ${items}">
+                        <td th:text="${products.^[productId == __${i.productId}__]?.productName} ?: ('Product #' + ${i.productId})">Item</td>
+                        <td class="num" th:text="${i.quantityOrdered}">20</td>
+                        <td class="num" th:text="${i.quantityReceived}">0</td>
+                        <td class="num"><span th:replace="~{fragments/layout :: money(${i.unitCost})}">0.00</span></td>
+                        <td th:if="${canReceive}">
+                            <input type="hidden" name="itemId" th:value="${i.purchaseOrderItemId}">
+                            <input type="number" name="qtyReceived" class="qty-input" min="0" th:value="${i.quantityOrdered - i.quantityReceived}">
+                        </td>
+                        <td th:if="${canReceive and business.usesExpiry}">
+                            <input type="date" name="expirationDate" class="input-field bg-white" style="min-width:0">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="actions" th:if="${canReceive}">
+                <button type="submit" class="btn-primary">Confirm receive</button>
+            </div>
+        </form>
+
+        <div class="actions" style="margin-top:14px">
+            <form th:if="${order.status.name() == 'DRAFT'}" th:action="@{/admin/purchase-orders/{id}/order(id=${order.purchaseOrderId})}" method="post">
+                <button type="submit" class="btn-primary">Mark as ordered</button>
+            </form>
+            <form th:if="${order.status.name() == 'DRAFT' or order.status.name() == 'ORDERED'}"
+                  th:action="@{/admin/purchase-orders/{id}/cancel(id=${order.purchaseOrderId})}" method="post"
+                  onsubmit="return confirm('Cancel this purchase order?')">
+                <button type="submit" class="btn-danger">Cancel order</button>
+            </form>
+            <a th:href="@{/admin/purchase-orders}" class="btn-secondary">Back</a>
+        </div>
+        <p class="muted" th:if="${order.status.name() == 'DRAFT'}">Receiving works once the order is marked as ordered.</p>
+    </div>
+</div>
+</body>
+</html>

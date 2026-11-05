@@ -39,8 +39,8 @@ public class UserAdminController {
     }
 
     @PostMapping
-    public String add(@RequestParam String username, @RequestParam String firstName,
-            @RequestParam String lastName, @RequestParam String password, @RequestParam Users.Role role,
+    public String add(@RequestParam(value = "username") String username, @RequestParam(value = "firstName") String firstName,
+            @RequestParam(value = "lastName") String lastName, @RequestParam(value = "password") String password, @RequestParam(value = "role") Users.Role role,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -55,7 +55,7 @@ public class UserAdminController {
     }
 
     @PostMapping("/{id}/deactivate")
-    public String deactivate(@PathVariable long id, HttpSession session, RedirectAttributes flash)
+    public String deactivate(@PathVariable("id") long id, HttpSession session, RedirectAttributes flash)
             throws SQLException {
         Users me = CurrentUser.get(session);
         if (id == me.getUserId()) {
@@ -72,7 +72,7 @@ public class UserAdminController {
     }
 
     @PostMapping("/{id}/activate")
-    public String activate(@PathVariable long id, HttpSession session, RedirectAttributes flash)
+    public String activate(@PathVariable("id") long id, HttpSession session, RedirectAttributes flash)
             throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {

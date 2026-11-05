@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('New purchase order')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('orders')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('New purchase order')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <!-- Restock suggestions: List<RestockSuggestions>. Empty until ordering cost and holding cost are set in Settings. -->
+        <div class="card">
+            <h2>Restock suggestions</h2>
+            <div class="empty" th:if="${#lists.isEmpty(suggestions)}">
+                No suggestions. They need ordering cost and holding cost in
+                <a th:href="@{/admin/settings}">Settings</a>, and some sales history.
+            </div>
+            <div class="data-table-wrapper" th:unless="${#lists.isEmpty(suggestions)}">
+                <table class="data-table">
+                    <thead><tr><th>Product</th><th class="num">Stock</th><th class="num">Reorder point</th><th class="num">Order qty (EOQ)</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="s : ${suggestions}">
+                        <td th:text="${s.product.productName}">Item</td>
+                        <td class="num" th:text="${s.product.currentStock}">2</td>
+                        <td class="num" th:text="${s.reorderPoint}">5</td>
+                        <td class="num" th:text="${s.economicOrderQuantity}">20</td>
+                        <td>
+                            <button type="button" class="btn-small primary add-suggestion"
+                                    th:attr="data-product=${s.product.productId},data-qty=${s.economicOrderQuantity},data-cost=${s.product.costPrice},data-supplier=${s.preferredSupplierId}">Add to order</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- POST /admin/purchase-orders: supplierId, expectedArrival, notes, and productId + quantity + unitCost per line
+             (same names repeated, so they arrive as three lists of the same length). -->
+        <form class="card" th:action="@{/admin/purchase-orders}" method="post">
+            <h2>Order</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="supplierId">Supplier</label>
+                    <select id="supplierId" name="supplierId" required>
+                        <option th:each="s : ${suppliers}" th:value="${s.supplierId}" th:text="${s.supplierName}">Supplier</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="expectedArrival">Expected arrival <span class="optional-text">(optional)</span></label>
+                    <input type="date" id="expectedArrival" name="expectedArrival">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes <span class="optional-text">(optional)</span></label>
+                <textarea id="notes" name="notes"></textarea>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>Product</th><th>Quantity</th><th>Unit cost</th><th></th></tr></thead>
+                    <tbody id="lines"></tbody>
+                </table>
+            </div>
+            <div class="actions">
+                <button type="button" class="btn-secondary" id="addLine">+ Add product</button>
+            </div>
+
+            <div class="actions" style="margin-top:20px">
+                <button type="submit" class="btn-primary" th:disabled="${#lists.isEmpty(suppliers)}">Create draft order</button>
+                <a th:href="@{/admin/purchase-orders}" class="btn-secondary">Cancel</a>
+                <span class="muted" th:if="${#lists.isEmpty(suppliers)}">Add a supplier first.</span>
+            </div>
+        </form>
+
+        <!-- Template for one line: the product list comes from ${products} -->
+        <select id="productTemplate" style="display:none">
+            <option value="">Choose a product...</option>
+            <option th:each="p : ${products}" th:value="${p.productId}" th:attr="data-cost=${p.costPrice}" th:text="${p.productName}">Item</option>
+        </select>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var lines = document.getElementById('lines');
+        var tpl = document.getElementById('productTemplate');
+
+        function addLine(productId, qty, cost) {
+            var tr = document.createElement('tr');
+            var sel = tpl.cloneNode(true);
+            sel.removeAttribute('id'); sel.style.display = ''; sel.name = 'productId'; sel.className = 'input-field bg-white';
+            var q = document.createElement('input');
+            q.type = 'number'; q.name = 'quantity'; q.min = 1; q.className = 'qty-input'; q.value = qty || '';
+            var c = document.createElement('input');
+            c.type = 'number'; c.name = 'unitCost'; c.min = 0; c.step = '0.01'; c.className = 'qty-input'; c.style.width = '110px'; c.value = cost || '';
+            var rm = document.createElement('button');
+            rm.type = 'button'; rm.className = 'btn-small danger'; rm.textContent = 'x';
+            rm.onclick = function () { tr.remove(); };
+            [sel, q, c, rm].forEach(function (el) { var td = document.createElement('td'); td.appendChild(el); tr.appendChild(td); });
+            if (productId) { sel.value = productId; }
+            // Picking a product fills in its cost price when the cost box is still empty.
+            sel.onchange = function () {
+                var o = sel.options[sel.selectedIndex];
+                if (o && o.dataset.cost && !c.value) { c.value = o.dataset.cost; }
+            };
+            lines.appendChild(tr);
+        }
+
+        document.getElementById('addLine').onclick = function () { addLine(); };
+        document.querySelectorAll('.add-suggestion').forEach(function (b) {
+            b.onclick = function () {
+                addLine(b.dataset.product, b.dataset.qty, b.dataset.cost);
+                if (b.dataset.supplier) { document.getElementById('supplierId').value = b.dataset.supplier; }
+            };
+        });
+        addLine();
+    })();
+</script>
+</body>
+</html>

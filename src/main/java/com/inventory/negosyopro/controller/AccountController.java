@@ -30,9 +30,9 @@ public class AccountController {
     }
 
     @PostMapping("/account/password")
-    public String changePassword(@RequestParam String oldPassword,
-            @RequestParam String newPassword,
-            @RequestParam String confirmPassword,
+    public String changePassword(@RequestParam(value = "oldPassword") String oldPassword,
+            @RequestParam(value = "newPassword") String newPassword,
+            @RequestParam(value = "confirmPassword") String confirmPassword,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         Users user = CurrentUser.get(session);
 

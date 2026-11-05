@@ -12,11 +12,16 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/**") // guard every URL...
                 .excludePathPatterns( // ...except these
+                        "/", // PublicController decides: dashboard or login
                         "/login",
-                        "/setup",
+                        "/signin", // old wireframe URLs, they only redirect
+                        "/create-business/**",
+                        "/setup", // sign-up + setup wizard (GET shows it, POST saves it)
                         "/css/**",
                         "/js/**",
                         "/images/**",
-                        "/error");
+                        "/favicon.ico",
+                        "/error",
+                        "/error/**");
     }
 }   

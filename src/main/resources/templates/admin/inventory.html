@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Inventory')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('inventory')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Inventory')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <!-- Expired and expiring batches: only for businesses that track expiry (the write-off URL is a 404 otherwise). -->
+        <th:block th:if="${business.usesExpiry}">
+            <div class="card">
+                <h2>Expired batches</h2>
+                <div class="empty" th:if="${#lists.isEmpty(expired)}">No expired stock.</div>
+                <div class="data-table-wrapper" th:unless="${#lists.isEmpty(expired)}">
+                    <table class="data-table">
+                        <thead><tr><th>Product</th><th>Batch</th><th class="num">Qty left</th><th>Expired on</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="b : ${expired}">
+                            <td th:text="${products.^[productId == __${b.productId}__]?.productName} ?: ('Product #' + ${b.productId})">Item</td>
+                            <td th:text="${b.batchNumber}">B-01</td>
+                            <td class="num" th:text="${b.quantityRemaining}">0</td>
+                            <td th:text="${#temporals.format(b.expirationDate, 'yyyy-MM-dd')}">2026-01-01</td>
+                            <td>
+                                <form th:action="@{/admin/inventory/batches/{id}/writeoff(id=${b.batchId})}" method="post"
+                                      onsubmit="return confirm('Write off what is left of this batch?')">
+                                    <button type="submit" class="btn-small danger">Write off</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Expiring soon</h2>
+                <div class="empty" th:if="${#lists.isEmpty(expiring)}">Nothing is about to expire.</div>
+                <div class="data-table-wrapper" th:unless="${#lists.isEmpty(expiring)}">
+                    <table class="data-table">
+                        <thead><tr><th>Product</th><th>Batch</th><th class="num">Qty left</th><th>Expires</th></tr></thead>
+                        <tbody>
+                        <tr th:each="b : ${expiring}">
+                            <td th:text="${products.^[productId == __${b.productId}__]?.productName} ?: ('Product #' + ${b.productId})">Item</td>
+                            <td th:text="${b.batchNumber}">B-01</td>
+                            <td class="num" th:text="${b.quantityRemaining}">0</td>
+                            <td th:text="${#temporals.format(b.expirationDate, 'yyyy-MM-dd')}">2026-01-01</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </th:block>
+
+        <div class="card">
+            <h2>Low stock</h2>
+            <div class="empty" th:if="${#lists.isEmpty(lowStock)}">Nothing is running low.</div>
+            <ul class="plain-list" th:unless="${#lists.isEmpty(lowStock)}">
+                <li th:each="p : ${lowStock}">
+                    <span><a th:href="@{/admin/inventory/{id}(id=${p.productId})}" th:text="${p.productName}">Item</a></span>
+                    <span class="muted" th:text="${p.currentStock} + ' left, reorder level ' + ${p.reorderLevel}">2 left</span>
+                </li>
+            </ul>
+        </div>
+
+        <h2 style="margin:10px 0">All products</h2>
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Code</th><th>Name</th><th class="num">Stock</th><th class="num">Reorder level</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${products}">
+                    <td th:text="${p.productCode}">P001</td>
+                    <td th:text="${p.productName}">Item</td>
+                    <td class="num" th:text="${p.trackInventory ? p.currentStock + ' ' + p.unit : '-'}">12</td>
+                    <td class="num" th:text="${p.trackInventory ? p.reorderLevel : '-'}">5</td>
+                    <td><a th:href="@{/admin/inventory/{id}(id=${p.productId})}" class="btn-small primary">Restock / history</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${#lists.isEmpty(products)}">No products yet.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

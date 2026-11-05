@@ -68,9 +68,9 @@ public class SalesController {
     // Optional live total: call it with fetch() from the POS page. Returns plain text like "125.50".
     @PostMapping("/sales/preview")
     @ResponseBody
-    public String preview(@RequestParam(required = false) Long discountId,
-            @RequestParam(required = false) List<Long> productId,
-            @RequestParam(required = false) List<Integer> quantity,
+    public String preview(@RequestParam(value = "discountId", required = false) Long discountId,
+            @RequestParam(value = "productId", required = false) List<Long> productId,
+            @RequestParam(value = "quantity", required = false) List<Integer> quantity,
             HttpSession session) {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -82,13 +82,13 @@ public class SalesController {
     }
 
     @PostMapping("/sales/checkout")
-    public String checkout(@RequestParam long paymentMethodId,
-            @RequestParam BigDecimal amountPaid,
-            @RequestParam(required = false) Long discountId,
-            @RequestParam(required = false) String customerName,
-            @RequestParam(required = false) String customerContact,
-            @RequestParam(required = false) List<Long> productId,
-            @RequestParam(required = false) List<Integer> quantity,
+    public String checkout(@RequestParam(value = "paymentMethodId") long paymentMethodId,
+            @RequestParam(value = "amountPaid") BigDecimal amountPaid,
+            @RequestParam(value = "discountId", required = false) Long discountId,
+            @RequestParam(value = "customerName", required = false) String customerName,
+            @RequestParam(value = "customerContact", required = false) String customerContact,
+            @RequestParam(value = "productId", required = false) List<Long> productId,
+            @RequestParam(value = "quantity", required = false) List<Integer> quantity,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         Users user = CurrentUser.get(session);
         long bid = user.getBusinessId();
@@ -118,7 +118,7 @@ public class SalesController {
     }
 
     @GetMapping("/sales/{id}/receipt")
-    public String receipt(@PathVariable long id, HttpSession session, Model model) {
+    public String receipt(@PathVariable("id") long id, HttpSession session, Model model) {
         long bid = CurrentUser.get(session).getBusinessId();
         Sales sale = salesDAO.getSaleById(id, bid); // null if it belongs to another business
         if (sale == null) {

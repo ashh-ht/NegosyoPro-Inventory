@@ -50,19 +50,19 @@ public class SettingsAdminController {
     }
 
     @PostMapping("/business")
-    public String saveBusiness(@RequestParam String businessName,
-            @RequestParam(required = false) String businessAddress,
-            @RequestParam(required = false) String businessContact,
-            @RequestParam(defaultValue = "false") boolean isTaxEnabled,
-            @RequestParam(defaultValue = "false") boolean isTaxInclusive,
-            @RequestParam(required = false) BigDecimal taxRate,
-            @RequestParam String currencyCode, @RequestParam String currencySymbol,
-            @RequestParam(required = false) String receiptFooter,
-            @RequestParam(defaultValue = "false") boolean isUsesExpiry,
-            @RequestParam(defaultValue = "false") boolean isUsesPurchaseOrders,
-            @RequestParam int expiryAlertDays,
-            @RequestParam(required = false) BigDecimal orderingCost,
-            @RequestParam(required = false) BigDecimal holdingCost,
+    public String saveBusiness(@RequestParam(value = "businessName") String businessName,
+            @RequestParam(value = "businessAddress", required = false) String businessAddress,
+            @RequestParam(value = "businessContact", required = false) String businessContact,
+            @RequestParam(value = "isTaxEnabled", defaultValue = "false") boolean isTaxEnabled,
+            @RequestParam(value = "isTaxInclusive", defaultValue = "false") boolean isTaxInclusive,
+            @RequestParam(value = "taxRate", required = false) BigDecimal taxRate,
+            @RequestParam(value = "currencyCode") String currencyCode, @RequestParam(value = "currencySymbol") String currencySymbol,
+            @RequestParam(value = "receiptFooter", required = false) String receiptFooter,
+            @RequestParam(value = "isUsesExpiry", defaultValue = "false") boolean isUsesExpiry,
+            @RequestParam(value = "isUsesPurchaseOrders", defaultValue = "false") boolean isUsesPurchaseOrders,
+            @RequestParam(value = "expiryAlertDays") int expiryAlertDays,
+            @RequestParam(value = "orderingCost", required = false) BigDecimal orderingCost,
+            @RequestParam(value = "holdingCost", required = false) BigDecimal holdingCost,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         Business old = businessDAO.getBusinessById(bid);
@@ -88,7 +88,7 @@ public class SettingsAdminController {
     }
 
     @PostMapping("/payment-methods")
-    public String addPaymentMethod(@RequestParam String methodName, HttpSession session,
+    public String addPaymentMethod(@RequestParam(value = "methodName") String methodName, HttpSession session,
             RedirectAttributes flash) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -101,7 +101,7 @@ public class SettingsAdminController {
     }
 
     @PostMapping("/payment-methods/{id}/active")
-    public String setPaymentActive(@PathVariable long id, @RequestParam boolean active,
+    public String setPaymentActive(@PathVariable("id") long id, @RequestParam(value = "active") boolean active,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         boolean ok = paymentMethodsDAO.setPaymentMethodActive(id, bid, active);
@@ -110,8 +110,8 @@ public class SettingsAdminController {
     }
 
     @PostMapping("/discounts")
-    public String addDiscount(@RequestParam String discountName, @RequestParam BigDecimal discountPercent,
-            @RequestParam(defaultValue = "false") boolean requiresId, HttpSession session,
+    public String addDiscount(@RequestParam(value = "discountName") String discountName, @RequestParam(value = "discountPercent") BigDecimal discountPercent,
+            @RequestParam(value = "requiresId", defaultValue = "false") boolean requiresId, HttpSession session,
             RedirectAttributes flash) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -124,7 +124,7 @@ public class SettingsAdminController {
     }
 
     @PostMapping("/discounts/{id}/active")
-    public String setDiscountActive(@PathVariable long id, @RequestParam boolean active,
+    public String setDiscountActive(@PathVariable("id") long id, @RequestParam(value = "active") boolean active,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         boolean ok = discountsDAO.setDiscountActive(id, bid, active);

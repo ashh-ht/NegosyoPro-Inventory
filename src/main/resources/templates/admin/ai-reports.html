@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('AI summary')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('ai')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('AI summary')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="toolbar">
+            <!-- GET /admin/ai-reports?reportType=WEEKLY|MONTHLY shows the latest saved summary of that type -->
+            <form th:action="@{/admin/ai-reports}" method="get">
+                <select name="reportType" class="input-field bg-white" onchange="this.form.submit()">
+                    <option value="WEEKLY" th:selected="${reportType == 'WEEKLY'}">Weekly</option>
+                    <option value="MONTHLY" th:selected="${reportType == 'MONTHLY'}">Monthly</option>
+                </select>
+            </form>
+        </div>
+
+        <div class="ai-container">
+            <h3 th:text="${reportType == 'MONTHLY' ? 'Latest monthly summary' : 'Latest weekly summary'}">Latest summary</h3>
+            <div class="ai-textbox" th:if="${report == null}">No summary yet. Generate one below.</div>
+            <div class="ai-textbox" th:unless="${report == null}" style="white-space:pre-wrap;text-align:left;display:block"
+                 th:text="${report.content}">Summary text</div>
+            <div class="ai-footer" th:unless="${report == null}"
+                 th:text="'Period: ' + ${report.periodStart} + ' to ' + ${report.periodEnd} + ' · generated ' + ${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm')}">Period</div>
+        </div>
+
+        <!-- POST /admin/ai-reports/generate: reportType, from, to. The local model can take a while. -->
+        <form class="card" id="genForm" th:action="@{/admin/ai-reports/generate}" method="post" style="margin-top:20px">
+            <h3>Generate a new summary</h3>
+            <input type="hidden" name="reportType" th:value="${reportType}">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="from">From</label>
+                    <input type="date" id="from" name="from" required
+                           th:value="${reportType == 'MONTHLY' ? today.minusDays(29) : today.minusDays(6)}">
+                </div>
+                <div class="form-group">
+                    <label for="to">To</label>
+                    <input type="date" id="to" name="to" th:value="${today}" required>
+                </div>
+            </div>
+            <p class="muted">Needs at least one completed sale in the period, and Ollama running on this computer.</p>
+            <button type="submit" class="btn-primary" id="genBtn">Generate summary</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('genForm').addEventListener('submit', function () {
+        var b = document.getElementById('genBtn');
+        b.textContent = 'Generating...';
+        // disabled after the submit has been sent, so the click is not lost
+        setTimeout(function () { b.disabled = true; }, 0);
+    });
+</script>
+</body>
+</html>

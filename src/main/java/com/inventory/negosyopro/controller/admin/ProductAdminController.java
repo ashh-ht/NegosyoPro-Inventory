@@ -53,14 +53,14 @@ public class ProductAdminController {
     }
 
     @PostMapping
-    public String add(@RequestParam long categoryId, @RequestParam String productCode,
-            @RequestParam String productName, @RequestParam BigDecimal costPrice,
-            @RequestParam BigDecimal sellingPrice, @RequestParam String unit,
-            @RequestParam(defaultValue = "false") boolean isTaxable,
-            @RequestParam(defaultValue = "false") boolean trackInventory,
-            @RequestParam(defaultValue = "false") boolean tracksExpiry,
-            @RequestParam(required = false) Integer shelfLifeDays,
-            @RequestParam int reorderLevel, @RequestParam int reorderQuantity,
+    public String add(@RequestParam(value = "categoryId") long categoryId, @RequestParam(value = "productCode") String productCode,
+            @RequestParam(value = "productName") String productName, @RequestParam(value = "costPrice") BigDecimal costPrice,
+            @RequestParam(value = "sellingPrice") BigDecimal sellingPrice, @RequestParam(value = "unit") String unit,
+            @RequestParam(value = "isTaxable", defaultValue = "false") boolean isTaxable,
+            @RequestParam(value = "trackInventory", defaultValue = "false") boolean trackInventory,
+            @RequestParam(value = "tracksExpiry", defaultValue = "false") boolean tracksExpiry,
+            @RequestParam(value = "shelfLifeDays", required = false) Integer shelfLifeDays,
+            @RequestParam(value = "reorderLevel") int reorderLevel, @RequestParam(value = "reorderQuantity") int reorderQuantity,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
 
@@ -83,7 +83,7 @@ public class ProductAdminController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable long id, HttpSession session, Model model) {
+    public String editForm(@PathVariable("id") long id, HttpSession session, Model model) {
         long bid = CurrentUser.get(session).getBusinessId();
         Products product = productsDAO.getProductById(id, bid, false);
         if (product == null) {
@@ -97,15 +97,15 @@ public class ProductAdminController {
     }
 
     @PostMapping("/{id}")
-    public String save(@PathVariable long id, @RequestParam long categoryId,
-            @RequestParam String productCode, @RequestParam String productName,
-            @RequestParam BigDecimal costPrice, @RequestParam BigDecimal sellingPrice,
-            @RequestParam String unit,
-            @RequestParam(defaultValue = "false") boolean isTaxable,
-            @RequestParam(defaultValue = "false") boolean trackInventory,
-            @RequestParam(defaultValue = "false") boolean tracksExpiry,
-            @RequestParam(required = false) Integer shelfLifeDays,
-            @RequestParam int reorderLevel, @RequestParam int reorderQuantity,
+    public String save(@PathVariable("id") long id, @RequestParam(value = "categoryId") long categoryId,
+            @RequestParam(value = "productCode") String productCode, @RequestParam(value = "productName") String productName,
+            @RequestParam(value = "costPrice") BigDecimal costPrice, @RequestParam(value = "sellingPrice") BigDecimal sellingPrice,
+            @RequestParam(value = "unit") String unit,
+            @RequestParam(value = "isTaxable", defaultValue = "false") boolean isTaxable,
+            @RequestParam(value = "trackInventory", defaultValue = "false") boolean trackInventory,
+            @RequestParam(value = "tracksExpiry", defaultValue = "false") boolean tracksExpiry,
+            @RequestParam(value = "shelfLifeDays", required = false) Integer shelfLifeDays,
+            @RequestParam(value = "reorderLevel") int reorderLevel, @RequestParam(value = "reorderQuantity") int reorderQuantity,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         Products existing = productsDAO.getProductById(id, bid, false);
@@ -128,7 +128,7 @@ public class ProductAdminController {
 
     // Products are deactivated, never deleted.
     @PostMapping("/{id}/active")
-    public String setActive(@PathVariable long id, @RequestParam boolean active,
+    public String setActive(@PathVariable("id") long id, @RequestParam(value = "active") boolean active,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         boolean ok = productsDAO.setProductActive(id, bid, active);
@@ -138,8 +138,8 @@ public class ProductAdminController {
     }
 
     @PostMapping("/{id}/reorder")
-    public String updateReorder(@PathVariable long id, @RequestParam int reorderLevel,
-            @RequestParam int reorderQuantity, HttpSession session, RedirectAttributes flash) {
+    public String updateReorder(@PathVariable("id") long id, @RequestParam(value = "reorderLevel") int reorderLevel,
+            @RequestParam(value = "reorderQuantity") int reorderQuantity, HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         if (reorderLevel < 0 || reorderQuantity < 0) {
             flash.addFlashAttribute("error", "Reorder numbers cannot be negative.");
@@ -152,11 +152,11 @@ public class ProductAdminController {
     }
 
     @PostMapping("/{id}/suppliers")
-    public String addSupplierLink(@PathVariable long id, @RequestParam long supplierId,
-            @RequestParam(required = false) String supplierProductCode,
-            @RequestParam(required = false) BigDecimal supplierCost,
-            @RequestParam(required = false) Integer leadTimeDays,
-            @RequestParam(defaultValue = "false") boolean preferred,
+    public String addSupplierLink(@PathVariable("id") long id, @RequestParam(value = "supplierId") long supplierId,
+            @RequestParam(value = "supplierProductCode", required = false) String supplierProductCode,
+            @RequestParam(value = "supplierCost", required = false) BigDecimal supplierCost,
+            @RequestParam(value = "leadTimeDays", required = false) Integer leadTimeDays,
+            @RequestParam(value = "preferred", defaultValue = "false") boolean preferred,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -170,7 +170,7 @@ public class ProductAdminController {
     }
 
     @PostMapping("/{id}/suppliers/{supplierId}/preferred")
-    public String setPreferred(@PathVariable long id, @PathVariable long supplierId,
+    public String setPreferred(@PathVariable("id") long id, @PathVariable("supplierId") long supplierId,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         boolean ok = productSuppliersDAO.setPreferredSupplier(id, supplierId, bid, true);

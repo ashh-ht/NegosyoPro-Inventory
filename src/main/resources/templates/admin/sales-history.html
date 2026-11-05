@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Sales history')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('sale-history')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Sales history')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="toolbar">
+            <!-- GET /admin/sales?from=yyyy-MM-dd&to=yyyy-MM-dd -->
+            <form th:action="@{/admin/sales}" method="get">
+                <label class="muted">From</label>
+                <input type="date" class="input-field bg-white" name="from" th:value="${from}" style="min-width:0">
+                <label class="muted">To</label>
+                <input type="date" class="input-field bg-white" name="to" th:value="${to}" style="min-width:0">
+                <button type="submit" class="btn-primary">Apply</button>
+            </form>
+        </div>
+
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Order #</th><th>Date</th><th>Customer</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${sales}">
+                    <td th:text="${s.orderNumber}">#0001</td>
+                    <td th:text="${#temporals.format(s.createdAt, 'yyyy-MM-dd HH:mm')}">date</td>
+                    <td th:text="${s.customerName != null ? s.customerName : 'Walk-in'}">Walk-in</td>
+                    <td class="num"><span th:replace="~{fragments/layout :: money(${s.totalAmount})}">0.00</span></td>
+                    <td>
+                        <span class="badge" th:classappend="${s.status.name() == 'COMPLETED'} ? 'green' : (${s.status.name() == 'CANCELLED'} ? 'red' : 'orange')"
+                              th:text="${s.status.name()}">COMPLETED</span>
+                    </td>
+                    <td><a th:href="@{/admin/sales/{id}(id=${s.salesId})}" class="btn-small primary">View</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${#lists.isEmpty(sales)}">No sales in this period.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

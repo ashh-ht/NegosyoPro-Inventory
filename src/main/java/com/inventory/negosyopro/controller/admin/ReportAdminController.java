@@ -32,8 +32,8 @@ public class ReportAdminController {
     }
 
     @GetMapping
-    public String reports(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+    public String reports(@RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             HttpSession session, Model model) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         if (to == null) {

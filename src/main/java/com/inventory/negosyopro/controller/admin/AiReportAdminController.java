@@ -33,7 +33,7 @@ public class AiReportAdminController {
     }
 
     @GetMapping
-    public String page(@RequestParam(defaultValue = "WEEKLY") String reportType,
+    public String page(@RequestParam(value = "reportType", defaultValue = "WEEKLY") String reportType,
             HttpSession session, Model model) {
         long bid = CurrentUser.get(session).getBusinessId();
         model.addAttribute("reportType", reportType);
@@ -44,9 +44,9 @@ public class AiReportAdminController {
 
     // Can take a while with the local model; the page should show "Generating..." on the button.
     @PostMapping("/generate")
-    public String generate(@RequestParam String reportType,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+    public String generate(@RequestParam(value = "reportType") String reportType,
+            @RequestParam(value = "from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(value = "to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         Users user = CurrentUser.get(session);
         try {

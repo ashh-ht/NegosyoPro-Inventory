@@ -38,7 +38,7 @@ public class CategoryAdminController {
     }
 
     @PostMapping
-    public String add(@RequestParam String categoryName, HttpSession session, RedirectAttributes flash)
+    public String add(@RequestParam(value = "categoryName") String categoryName, HttpSession session, RedirectAttributes flash)
             throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -51,8 +51,8 @@ public class CategoryAdminController {
     }
 
     @PostMapping("/{id}")
-    public String update(@PathVariable long id, @RequestParam String categoryName,
-            @RequestParam(defaultValue = "true") boolean active,
+    public String update(@PathVariable("id") long id, @RequestParam(value = "categoryName") String categoryName,
+            @RequestParam(value = "active", defaultValue = "true") boolean active,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         if (categoryName == null || categoryName.isBlank()) {
@@ -66,7 +66,7 @@ public class CategoryAdminController {
     }
 
     @PostMapping("/{id}/active")
-    public String setActive(@PathVariable long id, @RequestParam boolean active,
+    public String setActive(@PathVariable("id") long id, @RequestParam(value = "active") boolean active,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         if (categoriesDAO.setCategoryActive(id, bid, active)) {

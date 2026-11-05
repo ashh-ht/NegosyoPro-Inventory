@@ -25,8 +25,8 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public String list(@RequestParam(required = false) String q,
-            @RequestParam(required = false) Long categoryId,
+    public String list(@RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
             HttpSession session, Model model) {
         Users user = CurrentUser.get(session);
         long bid = user.getBusinessId();

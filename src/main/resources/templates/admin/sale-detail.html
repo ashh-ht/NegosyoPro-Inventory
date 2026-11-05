@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Sale')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('sale-history')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead(${'Sale ' + sale.orderNumber})}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="card">
+            <p><b>Status:</b>
+                <span class="badge" th:classappend="${sale.status.name() == 'COMPLETED'} ? 'green' : (${sale.status.name() == 'CANCELLED'} ? 'red' : 'orange')"
+                      th:text="${sale.status.name()}">COMPLETED</span></p>
+            <p><b>Date:</b> <span th:text="${#temporals.format(sale.createdAt, 'yyyy-MM-dd HH:mm')}">date</span></p>
+            <p><b>Customer:</b> <span th:text="${sale.customerName != null ? sale.customerName : 'Walk-in'}">Walk-in</span>
+                <span class="muted" th:if="${sale.customerContact != null}" th:text="'(' + ${sale.customerContact} + ')'"></span></p>
+            <p th:if="${sale.cancelReason != null}"><b>Cancel reason:</b> <span th:text="${sale.cancelReason}">reason</span></p>
+        </div>
+
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Total</th></tr></thead>
+                <tbody>
+                <tr th:each="i : ${items}">
+                    <td th:text="${i.productName}">Item</td>
+                    <td class="num" th:text="${i.quantity}">1</td>
+                    <td class="num"><span th:replace="~{fragments/layout :: money(${i.unitPrice})}">0.00</span></td>
+                    <td class="num"><span th:replace="~{fragments/layout :: money(${i.subtotal})}">0.00</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <ul class="plain-list">
+                <li><span>Subtotal</span><span><span th:replace="~{fragments/layout :: money(${sale.subtotal})}">0.00</span></span></li>
+                <li><span>Discount</span><span><span th:replace="~{fragments/layout :: money(${sale.discountAmount})}">0.00</span></span></li>
+                <li><span>Tax</span><span><span th:replace="~{fragments/layout :: money(${sale.taxAmount})}">0.00</span></span></li>
+                <li><b>Total</b><b><span th:replace="~{fragments/layout :: money(${sale.totalAmount})}">0.00</span></b></li>
+                <li><span>Paid</span><span><span th:replace="~{fragments/layout :: money(${sale.amountPaid})}">0.00</span></span></li>
+                <li><span>Change</span><span><span th:replace="~{fragments/layout :: money(${sale.changeAmount})}">0.00</span></span></li>
+            </ul>
+        </div>
+
+        <!-- POST /admin/sales/{id}/cancel: reason (required). Stock goes back to the shelf. -->
+        <form class="card" th:if="${sale.status.name() == 'COMPLETED'}"
+              th:action="@{/admin/sales/{id}/cancel(id=${sale.salesId})}" method="post"
+              onsubmit="return confirm('Cancel this sale? Stock will be returned.')">
+            <h3>Cancel this sale</h3>
+            <div class="form-group">
+                <label for="reason">Reason</label>
+                <input type="text" id="reason" name="reason" required>
+            </div>
+            <button type="submit" class="btn-danger">Cancel sale</button>
+        </form>
+
+        <div class="actions">
+            <a th:href="@{/sales/{id}/receipt(id=${sale.salesId})}" class="btn-secondary">View receipt</a>
+            <a th:href="@{/admin/sales}" class="btn-secondary">Back to history</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Settings')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('settings')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Settings')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <!-- ${settings} is the Business row. POST /admin/settings/business needs: businessName, currencyCode,
+             currencySymbol, expiryAlertDays; the rest is optional or defaults to false. -->
+        <form class="card" th:action="@{/admin/settings/business}" method="post">
+            <h2>Business</h2>
+            <div class="form-grid">
+                <div class="form-group"><label for="businessName">Business name</label>
+                    <input type="text" id="businessName" name="businessName" th:value="${settings.businessName}" required></div>
+                <div class="form-group"><label for="businessAddress">Address</label>
+                    <input type="text" id="businessAddress" name="businessAddress" th:value="${settings.businessAddress}"></div>
+                <div class="form-group"><label for="businessContact">Contact</label>
+                    <input type="text" id="businessContact" name="businessContact" th:value="${settings.businessContact}"></div>
+                <div class="form-group"><label for="receiptFooter">Receipt footer</label>
+                    <input type="text" id="receiptFooter" name="receiptFooter" th:value="${settings.receiptFooter}"></div>
+            </div>
+
+            <h2 style="margin-top:18px">Tax and currency</h2>
+            <div class="form-group check">
+                <input type="checkbox" id="isTaxEnabled" name="isTaxEnabled" value="true" th:checked="${settings.taxEnabled}">
+                <label for="isTaxEnabled">Charge VAT / tax</label>
+            </div>
+            <div class="form-group check">
+                <input type="checkbox" id="isTaxInclusive" name="isTaxInclusive" value="true" th:checked="${settings.taxInclusive}">
+                <label for="isTaxInclusive">Selling prices already include tax</label>
+            </div>
+            <div class="form-grid">
+                <div class="form-group"><label for="taxRate">Tax rate (%)</label>
+                    <input type="number" id="taxRate" name="taxRate" min="0" step="0.01" th:value="${settings.taxRate}"></div>
+                <div class="form-group"><label for="currencyCode">Currency code</label>
+                    <input type="text" id="currencyCode" name="currencyCode" maxlength="3" th:value="${settings.currencyCode}" required></div>
+                <div class="form-group"><label for="currencySymbol">Currency symbol</label>
+                    <input type="text" id="currencySymbol" name="currencySymbol" maxlength="5" th:value="${settings.currencySymbol}" required></div>
+            </div>
+
+            <h2 style="margin-top:18px">Inventory</h2>
+            <div class="form-group check">
+                <input type="checkbox" id="isUsesExpiry" name="isUsesExpiry" value="true" th:checked="${settings.usesExpiry}">
+                <label for="isUsesExpiry">Use expiry dates and batches</label>
+            </div>
+            <div class="form-group check">
+                <input type="checkbox" id="isUsesPurchaseOrders" name="isUsesPurchaseOrders" value="true" th:checked="${settings.usesPurchaseOrders}">
+                <label for="isUsesPurchaseOrders">Use purchase orders and restock suggestions</label>
+            </div>
+            <div class="form-grid">
+                <div class="form-group"><label for="expiryAlertDays">Expiry alert (days ahead)</label>
+                    <input type="number" id="expiryAlertDays" name="expiryAlertDays" min="0" th:value="${settings.expiryAlertDays}" required></div>
+                <div class="form-group"><label for="orderingCost">Ordering cost (per order)</label>
+                    <input type="number" id="orderingCost" name="orderingCost" min="0" step="0.01" th:value="${settings.orderingCost}"></div>
+                <div class="form-group"><label for="holdingCost">Holding cost (% per year)</label>
+                    <input type="number" id="holdingCost" name="holdingCost" min="0" step="0.01" th:value="${settings.holdingCost}"></div>
+            </div>
+            <p class="muted">Restock suggestions stay empty until ordering cost and holding cost are above 0.</p>
+
+            <button type="submit" class="btn-primary">Save settings</button>
+        </form>
+
+        <div class="two-col">
+            <div class="card">
+                <h2>Payment methods</h2>
+                <!-- POST /admin/settings/payment-methods: methodName -->
+                <form class="toolbar" th:action="@{/admin/settings/payment-methods}" method="post">
+                    <input type="text" class="input-field bg-white" name="methodName" placeholder="e.g. bank transfer" required>
+                    <button type="submit" class="btn-primary">Add</button>
+                </form>
+                <table class="data-table">
+                    <thead><tr><th>Method</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="m : ${paymentMethods}" th:classappend="${!m.active} ? 'row-inactive'">
+                        <td th:text="${m.methodName}">Cash</td>
+                        <td><span class="badge green" th:if="${m.active}">On</span><span class="badge" th:unless="${m.active}">Off</span></td>
+                        <td>
+                            <form class="inline-form" th:action="@{/admin/settings/payment-methods/{id}/active(id=${m.paymentMethodId})}" method="post">
+                                <input type="hidden" name="active" th:value="${!m.active}">
+                                <button type="submit" class="btn-small" th:text="${m.active} ? 'Turn off' : 'Turn on'">Turn off</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Discounts</h2>
+                <!-- POST /admin/settings/discounts: discountName, discountPercent, requiresId -->
+                <form th:action="@{/admin/settings/discounts}" method="post">
+                    <div class="toolbar">
+                        <input type="text" class="input-field bg-white" name="discountName" placeholder="Name, e.g. Senior" required>
+                        <input type="number" class="input-field bg-white" name="discountPercent" placeholder="%" min="0" max="100" step="0.01" required style="min-width:90px;width:90px">
+                    </div>
+                    <div class="form-group check">
+                        <input type="checkbox" id="requiresId" name="requiresId" value="true">
+                        <label for="requiresId">Cashier must check an ID</label>
+                    </div>
+                    <button type="submit" class="btn-primary">Add discount</button>
+                </form>
+                <table class="data-table" style="margin-top:14px">
+                    <thead><tr><th>Discount</th><th class="num">%</th><th>ID</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="d : ${discounts}" th:classappend="${!d.active} ? 'row-inactive'">
+                        <td th:text="${d.discountName}">Senior</td>
+                        <td class="num" th:text="${d.discountPercent}">20</td>
+                        <td th:text="${d.requiresId} ? 'Yes' : 'No'">Yes</td>
+                        <td><span class="badge green" th:if="${d.active}">On</span><span class="badge" th:unless="${d.active}">Off</span></td>
+                        <td>
+                            <form class="inline-form" th:action="@{/admin/settings/discounts/{id}/active(id=${d.discountId})}" method="post">
+                                <input type="hidden" name="active" th:value="${!d.active}">
+                                <button type="submit" class="btn-small" th:text="${d.active} ? 'Turn off' : 'Turn on'">Turn off</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="muted">Staff accounts are on the <a th:href="@{/admin/users}">Users</a> page.</p>
+    </div>
+</div>
+</body>
+</html>

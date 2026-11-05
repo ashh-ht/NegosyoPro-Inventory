@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Reports')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('reports')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Reports')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="toolbar">
+            <!-- GET /admin/reports?from=yyyy-MM-dd&to=yyyy-MM-dd (default: last 30 days, one year at most) -->
+            <form th:action="@{/admin/reports}" method="get">
+                <label class="muted">From</label>
+                <input type="date" class="input-field bg-white" name="from" th:value="${from}" style="min-width:0">
+                <label class="muted">To</label>
+                <input type="date" class="input-field bg-white" name="to" th:value="${to}" style="min-width:0">
+                <button type="submit" class="btn-primary">Apply</button>
+            </form>
+            <span class="spacer"></span>
+            <a th:href="@{/admin/ai-reports}" class="btn-secondary">AI summary</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Revenue</div>
+                <div class="stat-value"><span th:replace="~{fragments/layout :: money(${revenue})}">0.00</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Profit</div>
+                <div class="stat-value"><span th:replace="~{fragments/layout :: money(${profit})}">0.00</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Inventory value (at cost)</div>
+                <div class="stat-value"><span th:replace="~{fragments/layout :: money(${inventoryValue})}">0.00</span></div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card" style="flex:2">
+                <div class="stat-title" th:text="'Sales per day, ' + ${from} + ' to ' + ${to}">Sales per day</div>
+                <div id="salesChart" class="bar-chart"></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Top products</div>
+                <div class="empty" th:if="${#lists.isEmpty(topProducts)}">No sales in this period.</div>
+                <ul class="plain-list" th:unless="${#lists.isEmpty(topProducts)}">
+                    <li th:each="t, i : ${topProducts}">
+                        <span th:text="${i.count} + '. ' + ${t.productName}">1. Item</span>
+                        <span class="muted"><span th:text="${t.quantity}">0</span> sold ·
+                            <span th:replace="~{fragments/layout :: money(${t.revenue})}">0.00</span></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/charts.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var symbol = /*[[${business != null ? business.currencySymbol : ''}]]*/ '';
+    drawBars(document.getElementById('salesChart'),
+        /*[[${chartLabels}]]*/ [],
+        /*[[${chartValues}]]*/ [],
+        function (v) { return symbol + ' ' + v.toFixed(2); });
+    /*]]>*/
+</script>
+</body>
+</html>

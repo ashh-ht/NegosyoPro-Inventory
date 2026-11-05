@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head('No access')}"></th:block></head>
+<body class="auth-body">
+    <div class="auth-card">
+        <h1>No access</h1>
+        <p class="sub">You do not have permission to open this page.</p>
+        <a th:href="@{/dashboard}" class="btn-primary" style="text-align:center;text-decoration:none">Back to the dashboard</a>
+    </div>
+</body>
+</html>

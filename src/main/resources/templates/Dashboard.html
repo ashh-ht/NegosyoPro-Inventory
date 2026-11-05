@@ -1,84 +1,114 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NegosyoPro Dashboard</title>
-    <link rel="stylesheet" href="../static/css/DashboardCSS.css" th:href="@{/css/DashboardCSS.css}">
+    <th:block th:replace="~{fragments/layout :: head('Dashboard')}"></th:block>
 </head>
 <body>
-    <div class="dashboard-container">
-        
-        <div class="sidebar">
-            <div class="sidebar-header" th:text="${businessName}">Business Name</div>
-            <ul class="nav-menu">
-                <li class="active"><a href="#" th:href="@{/dashboard}">Dashboard</a></li>
-                <li><a href="#" th:href="@{/products}">Products</a></li>
-                <li><a href="#" th:href="@{/sales}">Sales/POS</a></li>
-                <li><a href="#" th:href="@{/suppliers}">Suppliers</a></li>
-                <li><a href="#" th:href="@{/reports}">Reports</a></li>
-                <li><a href="#" th:href="@{/settings}">Settings</a></li>
-                <li><a href="#" th:href="@{/my-account}">My Account</a></li>
-            </ul>
-            <div class="sidebar-footer">
-                <a href="#" th:href="@{/logout}" class="logout-link">Logout</a>
-                <span class="brand-text">NegosyoPro</span>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Dashboard')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+        <div class="alert alert-error" th:if="${param.denied}">That page is for admins only.</div>
+
+        <div class="actions" style="margin:0 0 20px">
+            <a th:href="@{/sales}" class="btn-primary">+ New sale</a>
+            <a th:href="@{/products}" class="btn-secondary">View products</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Sales today</div>
+                <div class="stat-value"><span th:replace="~{fragments/layout :: money(${salesToday})}">0.00</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Transactions today</div>
+                <div class="stat-value" th:text="${transactionsToday}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Low stock</div>
+                <div class="stat-value" th:text="${#lists.size(lowStock)}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Out of stock</div>
+                <div class="stat-value" th:text="${#lists.size(outOfStock)}">0</div>
             </div>
         </div>
 
-        <div class="main-content">
-            <div class="top-header">
-                <h1>Dashboard</h1>
-                <div class="user-profile">
-                    <span class="user-icon">(Icon Here)</span> Owner
-                </div>
+        <div class="stats-grid">
+            <div class="stat-card" style="flex:2">
+                <div class="stat-title">Sales, last 7 days</div>
+                <div id="salesChart" class="bar-chart"></div>
             </div>
-
-            <button class="new-sales-btn" onclick="location.href='/sales'">+ New Sales</button>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-title">Revenue Today</div>
-                    <div class="stat-value" th:text="${revenueToday}">Php 00.00</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">Sales Today</div>
-                    <div class="stat-value" th:text="${salesToday}">Php 00.00</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">Transaction Today</div>
-                    <div class="stat-value" th:text="${transactionsToday}">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">Products and Low Stocks</div>
-                    <div class="stat-value" th:text="${lowStockCount}">0</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Top products, last 30 days</div>
+                <div class="empty" th:if="${#lists.isEmpty(topProducts)}">No sales yet.</div>
+                <ul class="plain-list" th:unless="${#lists.isEmpty(topProducts)}">
+                    <li th:each="t, i : ${topProducts}">
+                        <span th:text="${i.count} + '. ' + ${t.productName}">1. Item</span>
+                        <span class="muted" th:text="${t.quantity} + ' sold'">0 sold</span>
+                    </li>
+                </ul>
             </div>
+        </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-title">Sales Overview Graph</div>
-                    <div class="stat-value"></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">Top Products</div>
-                    <div class="stat-value" th:text="${topProduct1}">1. Item Name</div>
-                    <div class="stat-value" th:text="${topProduct2}">2. Item Name</div>
-                    <div class="stat-value" th:text="${topProduct3}">3. Item Name</div>
-                    <div class="stat-value" th:text="${topProduct4}">4. Item Name</div>
-                </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Low stock</div>
+                <div class="empty" th:if="${#lists.isEmpty(lowStock)}">Nothing is running low.</div>
+                <ul class="plain-list" th:unless="${#lists.isEmpty(lowStock)}">
+                    <li th:each="p : ${lowStock}">
+                        <span th:text="${p.productName}">Item</span>
+                        <span class="muted" th:text="${p.currentStock} + ' left'">2 left</span>
+                    </li>
+                </ul>
             </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-title">Revenue Summary Graph</div>
-                    <div class="stat-value"></div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-title">Out of stock</div>
+                <div class="empty" th:if="${#lists.isEmpty(outOfStock)}">Nothing is out of stock.</div>
+                <ul class="plain-list" th:unless="${#lists.isEmpty(outOfStock)}">
+                    <li th:each="p : ${outOfStock}">
+                        <span th:text="${p.productName}">Item</span>
+                        <span class="muted">0 left</span>
+                    </li>
+                </ul>
             </div>
+            <!-- "expiring" is only in the model when the business tracks expiry -->
+            <div class="stat-card" th:if="${business != null and business.usesExpiry}">
+                <div class="stat-title">Expiring soon</div>
+                <div class="empty" th:if="${#lists.isEmpty(expiring)}">No batches are about to expire.</div>
+                <ul class="plain-list" th:unless="${#lists.isEmpty(expiring)}">
+                    <li th:each="b : ${expiring}">
+                        <span th:text="${productNames[b.productId] ?: ('Product #' + b.productId)}">Item</span>
+                        <span class="muted" th:text="${b.quantityRemaining} + ' left · ' + ${#temporals.format(b.expirationDate, 'yyyy-MM-dd')}">5 left · 2026-01-01</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-            <button class="view-inventory" onclick="location.href='/products'">View Inventory</button>
-
+        <!-- AI summary: "isAdmin" and "latestAi" are only for admins. latestAi can be null. -->
+        <div class="ai-container" th:if="${isAdmin}">
+            <h3>AI summary (weekly)</h3>
+            <div class="ai-textbox" th:if="${latestAi == null}">No summary yet. Generate one on the AI summary page.</div>
+            <div class="ai-textbox" th:unless="${latestAi == null}" style="white-space:pre-wrap;text-align:left;display:block"
+                 th:text="${latestAi.content}">Summary text</div>
+            <div class="ai-footer" th:unless="${latestAi == null}"
+                 th:text="'Last generated: ' + ${#temporals.format(latestAi.createdAt, 'yyyy-MM-dd HH:mm')}">Last generated</div>
+            <a th:href="@{/admin/ai-reports}" class="btn-secondary">Open AI summary</a>
         </div>
     </div>
+</div>
+
+<script th:src="@{/js/charts.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var symbol = /*[[${business != null ? business.currencySymbol : ''}]]*/ '';
+    drawBars(document.getElementById('salesChart'),
+        /*[[${chartLabels}]]*/ [],
+        /*[[${chartValues}]]*/ [],
+        function (v) { return symbol + ' ' + v.toFixed(2); });
+    /*]]>*/
+</script>
 </body>
 </html>

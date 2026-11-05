@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,6 +80,13 @@ public class DashboardController {
                 outOfStock.add(p);
             }
         }
+
+        // Product names by id: the expiring list only carries batch rows, which hold the product id.
+        Map<Long, String> productNames = new HashMap<>();
+        for (Products p : productsDAO.getProductsByBusiness(bid, false)) {
+            productNames.put(p.getProductId(), p.getProductName());
+        }
+        model.addAttribute("productNames", productNames);
 
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("salesToday", salesToday);

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Users')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('users')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Users')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <!-- POST /admin/users: username, firstName, lastName, password, role (ADMIN or EMPLOYEE) -->
+        <form class="card" th:action="@{/admin/users}" method="post">
+            <h3>Add user</h3>
+            <div class="form-grid">
+                <div class="form-group"><label for="firstName">First name</label><input type="text" id="firstName" name="firstName" required></div>
+                <div class="form-group"><label for="lastName">Last name</label><input type="text" id="lastName" name="lastName" required></div>
+                <div class="form-group"><label for="username">Username</label><input type="text" id="username" name="username" required autocomplete="off"></div>
+                <div class="form-group"><label for="password">Temporary password</label><input type="password" id="password" name="password" required autocomplete="new-password"></div>
+                <div class="form-group"><label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <option th:each="r : ${roles}" th:value="${r.name()}" th:text="${r.name() == 'ADMIN' ? 'Admin' : 'Employee'}">Employee</option>
+                    </select></div>
+            </div>
+            <button type="submit" class="btn-primary">Add user</button>
+        </form>
+
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                <tr th:each="u : ${users}" th:classappend="${!u.active} ? 'row-inactive'">
+                    <td th:text="${u.firstName + ' ' + u.lastName}">Name</td>
+                    <td th:text="${u.username}">user1</td>
+                    <td th:text="${u.owner ? 'Owner' : (u.role.name() == 'ADMIN' ? 'Admin' : 'Employee')}">Employee</td>
+                    <td><span class="badge green" th:if="${u.active}">Active</span><span class="badge" th:unless="${u.active}">Inactive</span></td>
+                    <td>
+                        <span class="muted" th:if="${u.owner}">Protected: cannot be deactivated</span>
+                        <span class="muted" th:if="${!u.owner and u.userId == me.userId}">This is you</span>
+                        <th:block th:if="${!u.owner and u.userId != me.userId}">
+                            <form class="inline-form" th:if="${u.active}" th:action="@{/admin/users/{id}/deactivate(id=${u.userId})}" method="post"
+                                  onsubmit="return confirm('Deactivate this user?')">
+                                <button type="submit" class="btn-small">Deactivate</button>
+                            </form>
+                            <form class="inline-form" th:unless="${u.active}" th:action="@{/admin/users/{id}/activate(id=${u.userId})}" method="post">
+                                <button type="submit" class="btn-small">Activate</button>
+                            </form>
+                        </th:block>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="muted">Password resets are not available yet. Deactivate the account and add a new one if someone is locked out.</p>
+    </div>
+</div>
+</body>
+</html>

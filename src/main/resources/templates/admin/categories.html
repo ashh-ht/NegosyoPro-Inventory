@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Categories')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('categories')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Categories')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <form class="card" th:action="@{/admin/categories}" method="post">
+            <h3>New category</h3>
+            <div class="toolbar" style="margin-bottom:0">
+                <input type="text" class="input-field bg-white" name="categoryName" placeholder="Category name" required>
+                <button type="submit" class="btn-primary">Add category</button>
+            </div>
+        </form>
+
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                <tr th:each="c : ${categories}" th:classappend="${!c.active} ? 'row-inactive'">
+                    <td>
+                        <!-- Rename keeps the current status: the controller's "active" defaults to true, so it is sent explicitly. -->
+                        <form class="inline-form" th:action="@{/admin/categories/{id}(id=${c.categoryId})}" method="post">
+                            <input type="hidden" name="active" th:value="${c.active}">
+                            <input type="text" class="input-field bg-white" name="categoryName" th:value="${c.categoryName}" required>
+                            <button type="submit" class="btn-small">Rename</button>
+                        </form>
+                    </td>
+                    <td>
+                        <span class="badge green" th:if="${c.active}">Active</span>
+                        <span class="badge" th:unless="${c.active}">Inactive</span>
+                    </td>
+                    <td>
+                        <form class="inline-form" th:action="@{/admin/categories/{id}/active(id=${c.categoryId})}" method="post">
+                            <input type="hidden" name="active" th:value="${!c.active}">
+                            <button type="submit" class="btn-small" th:text="${c.active} ? 'Deactivate' : 'Activate'">Deactivate</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${#lists.isEmpty(categories)}">No categories yet.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

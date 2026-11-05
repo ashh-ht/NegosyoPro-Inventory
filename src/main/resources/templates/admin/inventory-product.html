@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Stock')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('inventory')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead(${'Stock: ' + product.productName})}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Current stock</div>
+                <div class="stat-value" th:text="${product.trackInventory ? product.currentStock + ' ' + product.unit : 'Not tracked'}">12</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Reorder level</div>
+                <div class="stat-value" th:text="${product.reorderLevel}">5</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Cost price</div>
+                <div class="stat-value"><span th:replace="~{fragments/layout :: money(${product.costPrice})}">0.00</span></div>
+            </div>
+        </div>
+        <p style="margin:12px 0"><a th:href="@{/admin/products/{id}/edit(id=${product.productId})}" class="btn-small">Edit product</a>
+            <a th:href="@{/admin/inventory}" class="btn-small">Back to inventory</a></p>
+
+        <div class="alert alert-error" th:unless="${product.trackInventory}">
+            Stock is not tracked for this product. Turn on "Track stock" in the product to use these forms.
+        </div>
+
+        <div class="two-col" th:if="${product.trackInventory}">
+            <!-- POST /admin/inventory/{id}/restock: quantity (required); unitCost, expirationDate, supplierId (optional) -->
+            <form class="card" th:action="@{/admin/inventory/{id}/restock(id=${product.productId})}" method="post">
+                <h3>Restock</h3>
+                <div class="form-group">
+                    <label for="quantity">Quantity received</label>
+                    <input type="number" id="quantity" name="quantity" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="unitCost">Unit cost <span class="optional-text">(blank = the product's cost price)</span></label>
+                    <input type="number" id="unitCost" name="unitCost" min="0" step="0.01">
+                </div>
+                <div class="form-group" th:if="${business.usesExpiry and product.tracksExpiry}">
+                    <label for="expirationDate">Expiry date</label>
+                    <input type="date" id="expirationDate" name="expirationDate">
+                </div>
+                <div class="form-group">
+                    <label for="supplierId">Supplier <span class="optional-text">(optional)</span></label>
+                    <select id="supplierId" name="supplierId">
+                        <option value="">None</option>
+                        <option th:each="s : ${suppliers}" th:value="${s.supplierId}" th:text="${s.supplierName}">Supplier</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Receive stock</button>
+            </form>
+
+            <!-- POST /admin/inventory/{id}/adjust: quantityChange (+ or -), type (ADJUSTMENT or DAMAGE), reason (required) -->
+            <form class="card" th:action="@{/admin/inventory/{id}/adjust(id=${product.productId})}" method="post">
+                <h3>Adjust stock</h3>
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <select id="type" name="type" required>
+                        <option value="ADJUSTMENT">Adjustment (count correction)</option>
+                        <option value="DAMAGE">Damage</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quantityChange">Change</label>
+                    <input type="number" id="quantityChange" name="quantityChange" required>
+                    <span class="hint">Use a minus sign to remove stock, e.g. -3.</span>
+                </div>
+                <div class="form-group">
+                    <label for="reason">Reason</label>
+                    <input type="text" id="reason" name="reason" required>
+                </div>
+                <button type="submit" class="btn-primary">Save adjustment</button>
+            </form>
+        </div>
+
+        <!-- POST /admin/products/{id}/reorder: reorderLevel, reorderQuantity -->
+        <form class="card" th:action="@{/admin/products/{id}/reorder(id=${product.productId})}" method="post">
+            <h3>Reorder settings</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="reorderLevel">Reorder level</label>
+                    <input type="number" id="reorderLevel" name="reorderLevel" min="0" th:value="${product.reorderLevel}" required>
+                </div>
+                <div class="form-group">
+                    <label for="reorderQuantity">Reorder quantity</label>
+                    <input type="number" id="reorderQuantity" name="reorderQuantity" min="0" th:value="${product.reorderQuantity}" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-secondary">Save</button>
+        </form>
+
+        <h2 style="margin:10px 0">Stock history</h2>
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Type</th><th class="num">Qty</th><th class="num">Before</th><th class="num">After</th><th>Reason</th></tr></thead>
+                <tbody>
+                <tr th:each="t : ${transactions}">
+                    <td th:text="${#temporals.format(t.transactionDate, 'yyyy-MM-dd HH:mm')}">date</td>
+                    <td><span class="badge" th:text="${t.transactionType.name()}">RESTOCK</span></td>
+                    <td class="num" th:text="${t.quantity > 0 ? '+' + t.quantity : t.quantity}">+20</td>
+                    <td class="num" th:text="${t.previousStock}">0</td>
+                    <td class="num" th:text="${t.newStock}">20</td>
+                    <td th:text="${t.reason}">reason</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${#lists.isEmpty(transactions)}">No stock movements yet.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

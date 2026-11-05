@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Suppliers')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('suppliers')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('Suppliers')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="toolbar" th:if="${business.usesPurchaseOrders}">
+            <a th:href="@{/admin/purchase-orders}" class="btn-secondary">Purchase orders</a>
+            <a th:href="@{/admin/purchase-orders/new}" class="btn-secondary">New order + restock suggestions</a>
+        </div>
+
+        <!-- POST /admin/suppliers: supplierName (required), contactPerson, contactNumber, email, address (optional) -->
+        <form class="card" th:action="@{/admin/suppliers}" method="post">
+            <h3>Add supplier</h3>
+            <div class="form-grid">
+                <div class="form-group"><label for="supplierName">Supplier name</label><input type="text" id="supplierName" name="supplierName" required></div>
+                <div class="form-group"><label for="contactPerson">Contact person</label><input type="text" id="contactPerson" name="contactPerson"></div>
+                <div class="form-group"><label for="contactNumber">Phone</label><input type="text" id="contactNumber" name="contactNumber"></div>
+                <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email"></div>
+                <div class="form-group"><label for="address">Address</label><input type="text" id="address" name="address"></div>
+            </div>
+            <button type="submit" class="btn-primary">Add supplier</button>
+        </form>
+
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Supplier</th><th>Contact</th><th>Phone</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${suppliers}" th:classappend="${!s.active} ? 'row-inactive'">
+                    <td th:text="${s.supplierName}">Name</td>
+                    <td th:text="${s.contactPerson}">Person</td>
+                    <td th:text="${s.contactNumber}">0900</td>
+                    <td th:text="${s.email}">a@b.c</td>
+                    <td>
+                        <span class="badge green" th:if="${s.active}">Active</span>
+                        <span class="badge" th:unless="${s.active}">Inactive</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/suppliers/{id}/edit(id=${s.supplierId})}" class="btn-small">Edit</a>
+                        <form class="inline-form" th:action="@{/admin/suppliers/{id}/active(id=${s.supplierId})}" method="post">
+                            <input type="hidden" name="active" th:value="${!s.active}">
+                            <button type="submit" class="btn-small" th:text="${s.active} ? 'Deactivate' : 'Activate'">Deactivate</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${#lists.isEmpty(suppliers)}">No suppliers yet.</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -67,7 +67,7 @@ public class InventoryAdminController {
 
     // Stock history of one product, plus the restock / adjust forms.
     @GetMapping("/{productId}")
-    public String history(@PathVariable long productId, HttpSession session, Model model) {
+    public String history(@PathVariable("productId") long productId, HttpSession session, Model model) {
         long bid = CurrentUser.get(session).getBusinessId();
         Products product = productsDAO.getProductById(productId, bid, false);
         if (product == null) {
@@ -80,10 +80,10 @@ public class InventoryAdminController {
     }
 
     @PostMapping("/{productId}/restock")
-    public String restock(@PathVariable long productId, @RequestParam int quantity,
-            @RequestParam(required = false) BigDecimal unitCost,          // blank = product's cost price
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationDate,
-            @RequestParam(required = false) Long supplierId,
+    public String restock(@PathVariable("productId") long productId, @RequestParam(value = "quantity") int quantity,
+            @RequestParam(value = "unitCost", required = false) BigDecimal unitCost,          // blank = product's cost price
+            @RequestParam(value = "expirationDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expirationDate,
+            @RequestParam(value = "supplierId", required = false) Long supplierId,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         Users user = CurrentUser.get(session);
         try {
@@ -97,8 +97,8 @@ public class InventoryAdminController {
     }
 
     @PostMapping("/{productId}/adjust")
-    public String adjust(@PathVariable long productId, @RequestParam int quantityChange,
-            @RequestParam String type, @RequestParam String reason,
+    public String adjust(@PathVariable("productId") long productId, @RequestParam(value = "quantityChange") int quantityChange,
+            @RequestParam(value = "type") String type, @RequestParam(value = "reason") String reason,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         Users user = CurrentUser.get(session);
         try {
@@ -112,7 +112,7 @@ public class InventoryAdminController {
     }
 
     @PostMapping("/batches/{batchId}/writeoff")
-    public String writeOff(@PathVariable long batchId, HttpSession session, RedirectAttributes flash)
+    public String writeOff(@PathVariable("batchId") long batchId, HttpSession session, RedirectAttributes flash)
             throws SQLException {
         Users user = CurrentUser.get(session);
         Business business = businessDAO.getBusinessById(user.getBusinessId());

@@ -36,8 +36,8 @@ public class SaleAdminController {
     }
 
     @GetMapping
-    public String history(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+    public String history(@RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             HttpSession session, Model model) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         if (to == null) {
@@ -57,7 +57,7 @@ public class SaleAdminController {
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable long id, HttpSession session, Model model) {
+    public String detail(@PathVariable("id") long id, HttpSession session, Model model) {
         long bid = CurrentUser.get(session).getBusinessId();
         Sales sale = salesDAO.getSaleById(id, bid);
         if (sale == null) {
@@ -70,7 +70,7 @@ public class SaleAdminController {
 
     // cancelSale takes the USER id. Stock goes back into the batches.
     @PostMapping("/{id}/cancel")
-    public String cancel(@PathVariable long id, @RequestParam String reason,
+    public String cancel(@PathVariable("id") long id, @RequestParam(value = "reason") String reason,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         Users user = CurrentUser.get(session);
         if (reason == null || reason.isBlank()) {

@@ -40,7 +40,7 @@ public class SupplierAdminController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable long id, HttpSession session, Model model) {
+    public String editForm(@PathVariable("id") long id, HttpSession session, Model model) {
         long bid = CurrentUser.get(session).getBusinessId();
         Suppliers supplier = suppliersDAO.getSupplierById(id, bid, false);
         if (supplier == null) {
@@ -51,11 +51,11 @@ public class SupplierAdminController {
     }
 
     @PostMapping
-    public String add(@RequestParam String supplierName,
-            @RequestParam(required = false) String contactPerson,
-            @RequestParam(required = false) String contactNumber,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String address,
+    public String add(@RequestParam(value = "supplierName") String supplierName,
+            @RequestParam(value = "contactPerson", required = false) String contactPerson,
+            @RequestParam(value = "contactNumber", required = false) String contactNumber,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "address", required = false) String address,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
@@ -69,12 +69,12 @@ public class SupplierAdminController {
     }
 
     @PostMapping("/{id}")
-    public String update(@PathVariable long id, @RequestParam String supplierName,
-            @RequestParam(required = false) String contactPerson,
-            @RequestParam(required = false) String contactNumber,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String address,
-            @RequestParam(defaultValue = "true") boolean active,
+    public String update(@PathVariable("id") long id, @RequestParam(value = "supplierName") String supplierName,
+            @RequestParam(value = "contactPerson", required = false) String contactPerson,
+            @RequestParam(value = "contactNumber", required = false) String contactNumber,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "active", defaultValue = "true") boolean active,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         if (supplierName == null || supplierName.isBlank()) {
@@ -88,7 +88,7 @@ public class SupplierAdminController {
     }
 
     @PostMapping("/{id}/active")
-    public String setActive(@PathVariable long id, @RequestParam boolean active,
+    public String setActive(@PathVariable("id") long id, @RequestParam(value = "active") boolean active,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         boolean ok = suppliersDAO.setSupplierActive(id, bid, active);

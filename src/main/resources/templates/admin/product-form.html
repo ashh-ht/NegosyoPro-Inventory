@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('Product')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('products')}"></div>
+
+    <div class="main-content">
+        <!-- New product: only ${categories} is in the model.  Edit: also ${product}, ${productSuppliers}, ${suppliers}. -->
+        <div th:replace="~{fragments/layout :: pagehead(${product == null ? 'Add product' : 'Edit product'})}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="alert alert-error" th:if="${#lists.isEmpty(categories)}">
+            There are no categories yet. <a th:href="@{/admin/categories}">Create a category</a> first.
+        </div>
+
+        <!-- POST /admin/products (new) or POST /admin/products/{id} (edit). Both need every field below. -->
+        <form class="card" method="post"
+              th:action="${product == null} ? @{/admin/products} : @{/admin/products/{id}(id=${product.productId})}">
+            <h2>Details</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="productCode">Product code</label>
+                    <input type="text" id="productCode" name="productCode" th:value="${product?.productCode}" required>
+                </div>
+                <div class="form-group">
+                    <label for="productName">Name</label>
+                    <input type="text" id="productName" name="productName" th:value="${product?.productName}" required>
+                </div>
+                <div class="form-group">
+                    <label for="categoryId">Category</label>
+                    <select id="categoryId" name="categoryId" required>
+                        <option th:each="c : ${categories}" th:value="${c.categoryId}" th:text="${c.categoryName}"
+                                th:selected="${product != null and product.categoryId == c.categoryId}">Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="unit">Unit (e.g. pcs, kg)</label>
+                    <input type="text" id="unit" name="unit" th:value="${product != null ? product.unit : 'pcs'}" required>
+                </div>
+                <div class="form-group">
+                    <label for="costPrice">Cost price</label>
+                    <input type="number" id="costPrice" name="costPrice" min="0" step="0.01"
+                           th:value="${product != null ? product.costPrice : '0.00'}" required>
+                </div>
+                <div class="form-group">
+                    <label for="sellingPrice">Selling price</label>
+                    <input type="number" id="sellingPrice" name="sellingPrice" min="0" step="0.01"
+                           th:value="${product != null ? product.sellingPrice : '0.00'}" required>
+                </div>
+                <div class="form-group">
+                    <label for="reorderLevel">Reorder level</label>
+                    <input type="number" id="reorderLevel" name="reorderLevel" min="0"
+                           th:value="${product != null ? product.reorderLevel : 0}" required>
+                    <span class="hint">Shown as "Low" when stock is at or below this.</span>
+                </div>
+                <div class="form-group">
+                    <label for="reorderQuantity">Reorder quantity</label>
+                    <input type="number" id="reorderQuantity" name="reorderQuantity" min="0"
+                           th:value="${product != null ? product.reorderQuantity : 0}" required>
+                </div>
+            </div>
+
+            <div class="form-group check">
+                <input type="checkbox" id="isTaxable" name="isTaxable" value="true"
+                       th:checked="${product != null ? product.taxable : business.taxEnabled}">
+                <label for="isTaxable">Taxable (VAT applies)</label>
+            </div>
+            <div class="form-group check">
+                <input type="checkbox" id="trackInventory" name="trackInventory" value="true"
+                       th:checked="${product != null ? product.trackInventory : true}">
+                <label for="trackInventory">Track stock (turn off for services)</label>
+            </div>
+
+            <!-- Expiry fields only for businesses that use expiry. When hidden they are simply not sent, and the controller defaults to false. -->
+            <th:block th:if="${business.usesExpiry}">
+                <div class="form-group check">
+                    <input type="checkbox" id="tracksExpiry" name="tracksExpiry" value="true"
+                           th:checked="${product != null and product.tracksExpiry}">
+                    <label for="tracksExpiry">This product expires</label>
+                </div>
+                <div class="form-group">
+                    <label for="shelfLifeDays">Shelf life in days <span class="optional-text">(optional)</span></label>
+                    <input type="number" id="shelfLifeDays" name="shelfLifeDays" min="0"
+                           th:value="${product != null ? product.shelfLifeDays : null}">
+                </div>
+            </th:block>
+
+            <p class="muted" th:if="${product == null}">New products start at stock 0. Use Restock on the Inventory page to add opening stock.</p>
+            <p class="muted" th:unless="${product == null}">Stock is not changed here. Use the Inventory page to restock or adjust.</p>
+
+            <div class="actions">
+                <button type="submit" class="btn-primary" th:disabled="${#lists.isEmpty(categories)}">Save</button>
+                <a th:href="@{/products}" class="btn-secondary">Back to products</a>
+            </div>
+        </form>
+
+        <!-- ================= Edit only ================= -->
+        <th:block th:unless="${product == null}">
+
+            <div class="card">
+                <h2>Status</h2>
+                <p>This product is currently <b th:text="${product.active} ? 'active' : 'inactive'">active</b>.
+                    Products are never deleted, only deactivated.</p>
+                <form th:action="@{/admin/products/{id}/active(id=${product.productId})}" method="post">
+                    <input type="hidden" name="active" th:value="${!product.active}">
+                    <button type="submit" class="btn-secondary" th:text="${product.active} ? 'Deactivate' : 'Activate'">Deactivate</button>
+                </form>
+            </div>
+
+            <div class="card" th:if="${business.usesPurchaseOrders}">
+                <h2>Suppliers</h2>
+                <div class="data-table-wrapper" th:unless="${#lists.isEmpty(productSuppliers)}">
+                    <table class="data-table">
+                        <thead><tr><th>Supplier</th><th>Their code</th><th class="num">Cost</th><th class="num">Lead time</th><th>Preferred</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="ps : ${productSuppliers}">
+                            <td th:text="${suppliers.^[supplierId == __${ps.supplierId}__]?.supplierName} ?: ('Supplier #' + ${ps.supplierId})">Supplier</td>
+                            <td th:text="${ps.supplierProductCode}">code</td>
+                            <td class="num"><span th:replace="~{fragments/layout :: money(${ps.supplierCost})}">0.00</span></td>
+                            <td class="num" th:text="${ps.leadTimeDays != null ? ps.leadTimeDays + ' days' : '-'}">3 days</td>
+                            <td><span class="badge green" th:if="${ps.preferred}">Preferred</span></td>
+                            <td>
+                                <form th:unless="${ps.preferred}" th:action="@{/admin/products/{id}/suppliers/{sid}/preferred(id=${product.productId},sid=${ps.supplierId})}" method="post">
+                                    <button type="submit" class="btn-small">Make preferred</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty" th:if="${#lists.isEmpty(productSuppliers)}">No supplier is linked to this product yet.</div>
+
+                <h3 style="margin-top:16px">Link a supplier</h3>
+                <form th:action="@{/admin/products/{id}/suppliers(id=${product.productId})}" method="post">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="supplierId">Supplier</label>
+                            <select id="supplierId" name="supplierId" required>
+                                <option th:each="s : ${suppliers}" th:value="${s.supplierId}" th:text="${s.supplierName}">Supplier</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="supplierProductCode">Their product code <span class="optional-text">(optional)</span></label>
+                            <input type="text" id="supplierProductCode" name="supplierProductCode">
+                        </div>
+                        <div class="form-group">
+                            <label for="supplierCost">Their price to you</label>
+                            <input type="number" id="supplierCost" name="supplierCost" min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="leadTimeDays">Lead time (days)</label>
+                            <input type="number" id="leadTimeDays" name="leadTimeDays" min="0">
+                        </div>
+                    </div>
+                    <div class="form-group check">
+                        <input type="checkbox" id="preferred" name="preferred" value="true">
+                        <label for="preferred">Make this the preferred supplier</label>
+                    </div>
+                    <button type="submit" class="btn-primary" th:disabled="${#lists.isEmpty(suppliers)}">Link supplier</button>
+                    <span class="muted" th:if="${#lists.isEmpty(suppliers)}">Add a supplier first.</span>
+                </form>
+            </div>
+        </th:block>
+    </div>
+</div>
+</body>
+</html>
