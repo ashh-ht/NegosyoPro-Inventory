@@ -5,6 +5,7 @@ public class Template {
         PRODUCT,
         SERVICE
     }
+
     private long templateId;
     private String templateName;
     private TemplateType templateType;
@@ -23,7 +24,7 @@ public class Template {
         this.usesPurchaseOrders = usesPurchaseOrder;
         this.isActive = isActive;
     }
-    
+
     public long getTemplateId() {
         return templateId;
     }
