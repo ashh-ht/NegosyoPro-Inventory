@@ -173,7 +173,7 @@ public class InventoryService {
         int running = product.getCurrentStock();
 
         if (!product.isTracksExpiry()) {
-            logTransaction(conn, product.getProductId(), userId, null, type, -quantity, running,
+            logTransaction(conn, product.getProductId(), userId, null, type, - quantity, running,
                     running - quantity, referenceId, reason);
         } else {
             // Plan first, so nothing is changed if the batches cannot cover the quantity.

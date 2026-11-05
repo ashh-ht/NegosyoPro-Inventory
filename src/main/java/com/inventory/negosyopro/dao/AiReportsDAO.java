@@ -61,6 +61,6 @@ public class AiReportsDAO {
                 rs.getObject("period_start", LocalDate.class),
                 rs.getObject("period_end", LocalDate.class),
                 rs.getString("content"),
-                rs.getObject("created_at", LocalDateTime.class));
+                rs.getObject("generated_at", LocalDateTime.class));
     }
 }

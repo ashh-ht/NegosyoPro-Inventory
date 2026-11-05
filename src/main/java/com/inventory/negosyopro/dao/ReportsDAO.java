@@ -38,7 +38,7 @@ public class ReportsDAO {
     public List<ProductSalesSummaries> getTopSellingProducts(long businessId, LocalDate from, LocalDate to,
             int limit) throws SQLException {
         String sql = "SELECT item.product_name, SUM(item.quantity) AS qty, SUM(item.subtotal) AS revenue "
-                + "FROM sale_items item JOIN sales s ON s.sale_id = item.sale_id "
+                + "FROM sales_items item JOIN sales s ON s.sales_id = item.sales_id "
                 + "WHERE s.business_id = ? AND s.sale_status = 'COMPLETED' "
                 + "AND s.created_at >= ? AND s.created_at < ? "
                 + "GROUP BY item.product_id, item.product_name "
@@ -69,7 +69,7 @@ public class ReportsDAO {
     public BigDecimal getProfitByPeriod(long businessId, LocalDate from, LocalDate to) throws SQLException {
         String sql = "SELECT COALESCE(SUM((item.unit_price - item.cost_price) * item.quantity "
                 + "- item.discount_amount), 0) AS profit "
-                + "FROM sale_items item JOIN sales s ON s.sale_id = item.sale_id "
+                + "FROM sales_items item JOIN sales s ON s.sales_id = item.sales_id "
                 + "WHERE s.business_id = ? AND s.sale_status = 'COMPLETED' "
                 + "AND s.created_at >= ? AND s.created_at < ?";
 
@@ -108,7 +108,7 @@ public class ReportsDAO {
     // Units sold in the last N days (completed sales only).
     public int getUnitsSold(long productId, int days) throws SQLException {
         String sql = "SELECT COALESCE(SUM(item.quantity), 0) AS units "
-                + "FROM sale_items item JOIN sales s ON s.sale_id = item.sale_id "
+                + "FROM sales_items item JOIN sales s ON s.sales_id = item.sales_id "
                 + "WHERE item.product_id = ? AND s.sale_status = 'COMPLETED' AND s.created_at >= ?";
 
         try (Connection conn = dbConnection.getConnection();

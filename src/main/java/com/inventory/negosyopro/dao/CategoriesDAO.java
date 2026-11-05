@@ -79,4 +79,25 @@ public class CategoriesDAO {
         }
         return categories;
     }
+
+    public Categories getCategoryById(long categoryId, long businessId) {
+        String sql = "SELECT * FROM categories WHERE category_id = ? AND business_id = ?";
+        try (Connection conn = dbConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, categoryId);
+            pstmt.setLong(2, businessId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Categories(
+                            rs.getLong("category_id"),
+                            rs.getLong("business_id"),
+                            rs.getString("category_name"),
+                            rs.getBoolean("is_active"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -40,13 +40,13 @@ public class SalesDAO {
                 if (keys.next()) {
                     return keys.getLong(1);
                 }
-                throw new SQLException("Insert succeeded but no sale_id was returned.");
+                throw new SQLException("Insert succeeded but no sales_id was returned.");
             }
         }
     }
 
     public long insertSaleItem(Connection conn, SaleItems item) throws SQLException {
-        String sql = "INSERT INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, "
+        String sql = "INSERT INTO sales_items (sales_id, product_id, product_name, quantity, unit_price, "
                 + "cost_price, discount_amount, tax_amount, subtotal) "
                 + "VALUES (?,?,?,?,?,?,?,?,?)";
 
@@ -66,7 +66,7 @@ public class SalesDAO {
                 if (keys.next()) {
                     return keys.getLong(1);
                 }
-                throw new SQLException("Insert succeeded but no sale_item_id was returned.");
+                throw new SQLException("Insert succeeded but no sales_item_id was returned.");
             }
         }
     }
@@ -75,7 +75,7 @@ public class SalesDAO {
     public boolean updateSaleStatus(Connection conn, long saleId, long businessId, Sales.Status status,
             String cancelReason) throws SQLException {
         String sql = "UPDATE sales SET sale_status = ?, cancel_reason = ? "
-                + "WHERE sale_id = ? AND business_id = ?";
+                + "WHERE sales_id = ? AND business_id = ?";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, status.name());
@@ -91,7 +91,7 @@ public class SalesDAO {
     public List<Sales> getSales(long businessId, LocalDate from, LocalDate to) throws SQLException {
         String sql = "SELECT * FROM sales WHERE business_id = ? "
                 + "AND created_at >= ? AND created_at < ? "
-                + "ORDER BY created_at DESC, sale_id DESC";
+                + "ORDER BY created_at DESC, sales_id DESC";
         List<Sales> sales = new ArrayList<>();
 
         try (Connection conn = dbConnection.getConnection();
@@ -110,7 +110,7 @@ public class SalesDAO {
     }
 
     public Sales getSaleById(long saleId, long businessId) {
-        String sql = "SELECT * FROM sales WHERE sale_id = ? AND business_id = ?";
+        String sql = "SELECT * FROM sales WHERE sales_id = ? AND business_id = ?";
 
         try (Connection conn = dbConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -128,9 +128,9 @@ public class SalesDAO {
     }
 
     public List<SaleItems> getItemsBySale(long saleId, long businessId) {
-        String sql = "SELECT item.* FROM sale_items item "
-                + "JOIN sales s ON s.sale_id = item.sale_id "
-                + "WHERE item.sale_id = ? AND s.business_id = ?";
+        String sql = "SELECT item.* FROM sales_items item "
+                + "JOIN sales s ON s.sales_id = item.sales_id "
+                + "WHERE item.sales_id = ? AND s.business_id = ?";
         List<SaleItems> items = new ArrayList<>();
 
         try (Connection conn = dbConnection.getConnection();
@@ -148,20 +148,37 @@ public class SalesDAO {
         return items;
     }
 
-    // Next number for this business, e.g. ORD-00001. order_number is VARCHAR(20),
-    // so this fits.
-    public String nextOrderNumber(long businessId) throws SQLException {
-        String sql = "SELECT order_number FROM sales WHERE business_id = ? "
-                + "ORDER BY sale_id DESC LIMIT 1";
-        int next = 1;
+    public Sales getSaleByIdForUpdate(Connection conn, long saleId, long businessId) throws SQLException {
+        String sql = "SELECT * FROM sales WHERE sales_id = ? AND business_id = ? FOR UPDATE";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, saleId);
+            pstmt.setLong(2, businessId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapSale(rs);
+                }
+            }
+        }
+        return null;
+    }
 
-        try (Connection conn = dbConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    public String nextOrderNumber(Connection conn, long businessId) throws SQLException {
+        try (PreparedStatement lock = conn.prepareStatement(
+                "SELECT business_id FROM businesses WHERE business_id = ? FOR UPDATE")) {
+            lock.setLong(1, businessId);
+            try (ResultSet rs = lock.executeQuery()) {
+                rs.next();
+            }
+        }
+        String sql = "SELECT order_number FROM sales WHERE business_id = ? "
+                + "ORDER BY sales_id DESC LIMIT 1";
+        int next = 1;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, businessId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    String last = rs.getString("order_number"); // e.g. "ORD-00007"
-                    next = Integer.parseInt(last.substring(4)) + 1; // skip "ORD-"
+                    String last = rs.getString("order_number");
+                    next = Integer.parseInt(last.substring(4)) + 1;
                 }
             }
         }
@@ -169,14 +186,12 @@ public class SalesDAO {
     }
 
     // Constructor argument order = column order of the sales table.
-    // If your Sales constructor is ordered differently, reorder these arguments to
-    // match it.
     private Sales mapSale(ResultSet rs) throws SQLException {
         long discountId = rs.getLong("discount_id");
         Long discountIdOrNull = rs.wasNull() ? null : discountId; // optional discount
 
         return new Sales(
-                rs.getLong("sale_id"),
+                rs.getLong("sales_id"),
                 rs.getLong("business_id"),
                 rs.getLong("user_id"),
                 rs.getString("order_number"),
@@ -198,8 +213,8 @@ public class SalesDAO {
     // Constructor argument order = column order of the sale_items table.
     private SaleItems mapSaleItem(ResultSet rs) throws SQLException {
         return new SaleItems(
-                rs.getLong("sale_item_id"),
-                rs.getLong("sale_id"),
+                rs.getLong("sales_item_id"),
+                rs.getLong("sales_id"),
                 rs.getLong("product_id"),
                 rs.getString("product_name"),
                 rs.getInt("quantity"),

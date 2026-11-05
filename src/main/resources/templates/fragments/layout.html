@@ -1,67 +1,80 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <body>
 
-<!-- Used inside <head>:  <th:block th:replace="~{fragments/layout :: head('Page title')}"></th:block> -->
-<th:block th:fragment="head(title)">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title} + ' - NegosyoPro'">NegosyoPro</title>
-    <link rel="stylesheet" th:href="@{/css/DashboardCSS.css}">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-</th:block>
+    <!-- Standard pages: DashboardCSS.css (now the only stylesheet for admin/POS pages) -->
+    <th:block th:fragment="head(title)">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title th:text="${title} + ' - NegosyoPro'">NegosyoPro</title>
+        <link rel="stylesheet" th:href="@{/css/DashboardCSS.css}">
+    </th:block>
 
-<!-- Left menu.  <div th:replace="~{fragments/layout :: sidebar('products')}"></div>
-     ${me} and ${business} come from GlobalAdvice. Admin-only links are not rendered for employees
-     (the LoginInterceptor blocks /admin for them anyway). -->
-<div class="sidebar" th:fragment="sidebar(active)">
-    <div class="sidebar-header" th:text="${business != null} ? ${business.businessName} : 'NegosyoPro'">Business Name</div>
-    <ul class="nav-menu">
-        <li th:classappend="${active == 'dashboard'} ? 'active'"><a th:href="@{/dashboard}">Dashboard</a></li>
-        <li th:classappend="${active == 'products'} ? 'active'"><a th:href="@{/products}">Products</a></li>
-        <li th:classappend="${active == 'sales'} ? 'active'"><a th:href="@{/sales}">Sales / POS</a></li>
+    <!-- Auth/setup pages: load ONLY the specified CSS file, no DashboardCSS -->
+    <th:block th:fragment="headAuth(title, cssFile)">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title th:text="${title} + ' - NegosyoPro'">NegosyoPro</title>
+        <link rel="stylesheet" th:href="@{'/css/' + ${cssFile}}">
+    </th:block>
 
-        <th:block th:if="${me != null and me.role.name() == 'ADMIN'}">
-            <li class="nav-group">Manage</li>
-            <li th:classappend="${active == 'categories'} ? 'active'"><a th:href="@{/admin/categories}">Categories</a></li>
-            <li th:classappend="${active == 'inventory'} ? 'active'"><a th:href="@{/admin/inventory}">Inventory</a></li>
-            <li th:classappend="${active == 'sale-history'} ? 'active'"><a th:href="@{/admin/sales}">Sales history</a></li>
-            <li th:classappend="${active == 'suppliers'} ? 'active'"><a th:href="@{/admin/suppliers}">Suppliers</a></li>
-            <li th:if="${business != null and business.usesPurchaseOrders}"
-                th:classappend="${active == 'orders'} ? 'active'"><a th:href="@{/admin/purchase-orders}">Purchase orders</a></li>
-            <li th:classappend="${active == 'reports'} ? 'active'"><a th:href="@{/admin/reports}">Reports</a></li>
-            <li th:classappend="${active == 'ai'} ? 'active'"><a th:href="@{/admin/ai-reports}">AI summary</a></li>
-            <li th:classappend="${active == 'users'} ? 'active'"><a th:href="@{/admin/users}">Users</a></li>
-            <li th:classappend="${active == 'settings'} ? 'active'"><a th:href="@{/admin/settings}">Settings</a></li>
-        </th:block>
+    <div class="sidebar" th:fragment="sidebar(active)">
+        <div class="sidebar-header" th:text="${business != null ? business.businessName : 'NegosyoPro'}">Business Name
+        </div>
+        <ul class="nav-menu">
+            <li th:classappend="${active == 'dashboard' ? 'active' : ''}"><a th:href="@{/dashboard}">Dashboard</a></li>
+            <li th:classappend="${active == 'products'  ? 'active' : ''}"><a th:href="@{/products}">Products</a></li>
+            <li th:classappend="${active == 'sales'     ? 'active' : ''}"><a th:href="@{/sales}">Sales / POS</a></li>
 
-        <li class="nav-group">Account</li>
-        <li th:classappend="${active == 'account'} ? 'active'"><a th:href="@{/account}">My account</a></li>
-    </ul>
-    <div class="sidebar-footer">
-        <a th:href="@{/logout}" class="logout-link">Logout</a>
-        <span class="brand-text">NegosyoPro</span>
+            <th:block th:if="${me != null and me.role.name() == 'ADMIN'}">
+                <li class="nav-group">Manage</li>
+                <li th:classappend="${active == 'categories'  ? 'active' : ''}"><a
+                        th:href="@{/admin/categories}">Categories</a></li>
+                <li th:classappend="${active == 'inventory'   ? 'active' : ''}"><a
+                        th:href="@{/admin/inventory}">Inventory</a></li>
+                <li th:classappend="${active == 'sale-history'? 'active' : ''}"><a th:href="@{/admin/sales}">Sales
+                        history</a></li>
+                <li th:classappend="${active == 'suppliers'   ? 'active' : ''}"><a
+                        th:href="@{/admin/suppliers}">Suppliers</a></li>
+                <li th:if="${business != null and business.usesPurchaseOrders}"
+                    th:classappend="${active == 'orders' ? 'active' : ''}"><a
+                        th:href="@{/admin/purchase-orders}">Purchase orders</a></li>
+                <li th:classappend="${active == 'reports'  ? 'active' : ''}"><a th:href="@{/admin/reports}">Reports</a>
+                </li>
+                <li th:classappend="${active == 'ai'       ? 'active' : ''}"><a th:href="@{/admin/ai-reports}">AI
+                        summary</a></li>
+                <li th:classappend="${active == 'users'    ? 'active' : ''}"><a th:href="@{/admin/users}">Users</a></li>
+                <li th:classappend="${active == 'settings' ? 'active' : ''}"><a
+                        th:href="@{/admin/settings}">Settings</a></li>
+            </th:block>
+
+            <li class="nav-group">Account</li>
+            <li th:classappend="${active == 'account' ? 'active' : ''}"><a th:href="@{/account}">My account</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a th:href="@{/logout}" class="logout-link">Logout</a>
+            <span class="brand-text">NegosyoPro</span>
+        </div>
     </div>
-</div>
 
-<!-- Page title + who is logged in -->
-<div class="top-header" th:fragment="pagehead(title)">
-    <h1 th:text="${title}">Title</h1>
-    <div class="user-profile" th:if="${me != null}">
-        <span th:text="${me.firstName + ' ' + me.lastName}">Name</span>
-        <span class="badge blue" th:text="${me.owner} ? 'Owner' : (${me.role.name() == 'ADMIN'} ? 'Admin' : 'Employee')">Role</span>
+    <div class="top-header" th:fragment="pagehead(title)">
+        <h1 th:text="${title}">Title</h1>
+        <div class="user-profile" th:if="${me != null}">
+            <span th:text="${me.firstName + ' ' + me.lastName}">Name</span>
+            <span class="badge blue"
+                th:text="${me.owner ? 'Owner' : (me.role.name() == 'ADMIN' ? 'Admin' : 'Employee')}">Role</span>
+        </div>
     </div>
-</div>
 
-<!-- Flash messages: ${success} / ${error} from RedirectAttributes, or ${error} set straight on the model -->
-<th:block th:fragment="flash">
-    <div class="alert alert-success" th:if="${success}" th:text="${success}">Saved.</div>
-    <div class="alert alert-error" th:if="${error}" th:text="${error}">Something went wrong.</div>
-</th:block>
+    <th:block th:fragment="flash">
+        <div class="alert alert-success" th:if="${success}" th:text="${success}">Saved.</div>
+        <div class="alert alert-error" th:if="${error}" th:text="${error}">Something went wrong.</div>
+    </th:block>
 
-<!-- Money: currency symbol from the business + 2 decimals.  <span th:replace="~{fragments/layout :: money(${x.price})}"></span> -->
-<span th:fragment="money(v)"
-      th:text="${v == null ? '' : (business != null ? business.currencySymbol + ' ' : '') + #numbers.formatDecimal(v, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+    <span th:fragment="money(v)" th:text="${v == null ? '' : (business != null ? business.currencySymbol + ' ' : '')
+              + #numbers.formatDecimal(v, 1, 'COMMA', 2, 'POINT')}">0.00</span>
 
 </body>
+
 </html>

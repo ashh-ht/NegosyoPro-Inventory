@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{fragments/layout :: headAuth('Sign in', 'StartingPageCSS.css')}"></th:block>
+    <style>
+        .flash {
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            font-size: 13px;
+        }
+
+        .flash.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .flash.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        a.sign-in-btn {
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+
+        <div class="left-panel-SignIn">
+            <h2>Sign In</h2>
+
+            <div class="flash error" th:if="${error}" th:text="${error}">Error</div>
+            <div class="flash success" th:if="${success}" th:text="${success}">Saved</div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required autofocus autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="create-btn">Sign In</button>
+            </form>
+        </div>
+
+        <div class="right-panel-SignIn">
+            <h2>Welcome to NegosyoPro!</h2>
+            <p>Do not have an account yet?</p>
+            <a th:href="@{/setup}" class="sign-in-btn">Create Account</a>
+        </div>
+    </div>
+</body>
+
+</html>

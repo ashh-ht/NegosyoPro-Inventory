@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/layout :: head('My account')}"></th:block>
+</head>
+<body>
+<div class="dashboard-container">
+    <div th:replace="~{fragments/layout :: sidebar('account')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/layout :: pagehead('My account')}"></div>
+        <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+
+        <div class="card">
+            <h2>Your details</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>First name</label><input type="text" th:value="${me.firstName}" disabled></div>
+                <div class="form-group"><label>Last name</label><input type="text" th:value="${me.lastName}" disabled></div>
+                <div class="form-group"><label>Username</label><input type="text" th:value="${me.username}" disabled></div>
+                <div class="form-group"><label>Role</label>
+                    <input type="text" disabled th:value="${me.owner} ? 'Owner' : (${me.role.name() == 'ADMIN'} ? 'Admin' : 'Employee')"></div>
+            </div>
+            <p class="muted">Ask an admin if your name or username needs to change.</p>
+        </div>
+
+        <form class="card" th:action="@{/account/password}" method="post">
+            <h2>Change password</h2>
+            <div class="form-group">
+                <label for="oldPassword">Current password</label>
+                <input type="password" id="oldPassword" name="oldPassword" required autocomplete="current-password">
+            </div>
+            <div class="form-group">
+                <label for="newPassword">New password</label>
+                <input type="password" id="newPassword" name="newPassword" required autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm new password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn-primary">Save password</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

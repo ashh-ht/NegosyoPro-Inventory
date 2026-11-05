@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{fragments/layout :: headAuth('Create your business', 'BusinessCSS.css')}"></th:block>
+    <style>
+        .wizard-panel {
+            display: none;
+        }
+
+        .wizard-panel.active {
+            display: block;
+        }
+
+        .flash {
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            font-size: 13px;
+        }
+
+        .flash.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .flash.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        label.card {
+            cursor: pointer;
+            position: relative;
+        }
+
+        label.card input[type=radio] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        label.card:has(input[type=radio]:checked) {
+            border-color: #1a7a6b;
+            background: #ecfdf5;
+            box-shadow: 0 0 0 2px #1a7a6b;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-row>.input-group {
+            flex: 1 1 200px;
+            min-width: 180px;
+        }
+
+        .help-text {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: normal;
+            margin-top: 4px;
+        }
+
+        .field-error {
+            color: #dc2626;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .button-group .back-btn[style*="hidden"] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-wrapper">
+
+        <div class="header">
+            <h1>NegosyoPro</h1>
+            <p>Setup Your Business</p>
+        </div>
+
+        <div class="stepper-wrapper">
+            <div class="steps">
+                <div class="step active">1. Business</div>
+                <div class="step">2. Template</div>
+                <div class="step">3. Tax &amp; Currency</div>
+                <div class="step">4. Owner</div>
+            </div>
+            <div class="step-line"></div>
+        </div>
+
+        <div class="form-card">
+            <div class="flash error" th:if="${error}" th:text="${error}">Error</div>
+            <div class="flash success" th:if="${success}" th:text="${success}">Saved</div>
+
+            <form id="setupForm" th:action="@{/setup}" method="post">
+
+                <!-- Step 1 -->
+                <div class="wizard-panel active">
+                    <div class="input-group">
+                        <label for="businessName">Business name</label>
+                        <input type="text" id="businessName" name="businessName" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="businessAddress">Address</label>
+                        <input type="text" id="businessAddress" name="businessAddress">
+                    </div>
+                    <div class="input-group">
+                        <label for="businessContact">Contact number or email</label>
+                        <input type="text" id="businessContact" name="businessContact">
+                    </div>
+                    <div class="input-group">
+                        <label for="receiptFooter">Receipt footer <span class="help-text">(optional)</span></label>
+                        <input type="text" id="receiptFooter" name="receiptFooter"
+                            value="Thank you for shopping with us!">
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="wizard-panel">
+                    <div class="section-title">Pick a template</div>
+                    <div class="section-desc">A template decides which modules you get: expiry tracking and purchase
+                        orders.</div>
+
+                    <div class="cards-container">
+                        <label class="card" th:each="t : ${templates}">
+                            <input type="radio" name="templateId" th:value="${t.templateId}">
+                            <div class="card-header">
+                                <span class="card-title" th:text="${t.templateName}">Retail</span>
+                                <span class="badge"
+                                    th:text="${t.templateType.name() == 'SERVICE' ? 'Service' : 'Product'}">Product</span>
+                            </div>
+                            <div class="dots">
+                                <div class="dot teal"></div>
+                                <div class="dot blue"></div>
+                                <div class="dot orange"></div>
+                            </div>
+                            <p th:text="${t.description}">Description</p>
+                            <p>Expiry: <b th:text="${t.usesExpiry ? 'Yes' : 'No'}">No</b>
+                                · PO: <b th:text="${t.usesPurchaseOrders ? 'Yes' : 'No'}">Yes</b></p>
+                        </label>
+                    </div>
+                    <div th:if="${#lists.isEmpty(templates)}" style="padding:20px;text-align:center;color:#6b7280">
+                        No templates found. Add rows to <code>business_templates</code> first.
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="wizard-panel">
+                    <div class="form-section">
+                        <h3>VAT</h3>
+                        <div class="radio-group">
+                            <label class="radio-box"><input type="radio" name="isTaxEnabled" value="true" checked>
+                                On</label>
+                            <label class="radio-box"><input type="radio" name="isTaxEnabled" value="false"> Off</label>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3>VAT rate (%)</h3>
+                        <input type="number" class="input-field" name="taxRate" value="12" min="0" max="100" step="0.01"
+                            required>
+                    </div>
+                    <div class="form-section">
+                        <h3>Prices include VAT?</h3>
+                        <div class="radio-group">
+                            <label class="radio-box"><input type="radio" name="isTaxInclusive" value="true" checked>
+                                Yes</label>
+                            <label class="radio-box"><input type="radio" name="isTaxInclusive" value="false"> No</label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="currencyCode">Currency</label>
+                            <select id="currencyCode" name="currencyCode" class="input-field">
+                                <option value="PHP" data-symbol="₱" selected>PHP - Philippine peso</option>
+                                <option value="USD" data-symbol="$">USD - US dollar</option>
+                                <option value="EUR" data-symbol="€">EUR - Euro</option>
+                                <option value="SGD" data-symbol="S$">SGD - Singapore dollar</option>
+                                <option value="MYR" data-symbol="RM">MYR - Malaysian ringgit</option>
+                                <option value="THB" data-symbol="฿">THB - Thai baht</option>
+                                <option value="IDR" data-symbol="Rp">IDR - Indonesian rupiah</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="currencySymbol">Currency symbol</label>
+                            <input type="text" id="currencySymbol" name="currencySymbol" value="₱" maxlength="5"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="margin-top:20px">Inventory defaults</div>
+                    <div class="section-desc">You can leave these at their defaults.</div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="expiryAlertDays">Expiry alert (days ahead)</label>
+                            <input type="number" id="expiryAlertDays" name="expiryAlertDays" value="7" min="0" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="orderingCost">Ordering cost (per order)</label>
+                            <input type="number" id="orderingCost" name="orderingCost" value="0" min="0" step="0.01"
+                                required>
+                            <span class="help-text">Used for restock suggestions.</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="holdingCost">Holding cost (% per year)</label>
+                            <input type="number" id="holdingCost" name="holdingCost" value="0" min="0" step="0.01"
+                                required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="wizard-panel">
+                    <div class="section-title">Owner account</div>
+                    <div class="section-desc">This account becomes the business owner (cannot be removed).</div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="firstName">First name</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="lastName">Last name</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required autocomplete="new-password">
+                    </div>
+                    <div class="input-group">
+                        <label for="confirmPassword">Confirm password</label>
+                        <input type="password" id="confirmPassword" required autocomplete="new-password">
+                        <span class="field-error" id="pwError" style="display:none"></span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="back-btn" id="backBtn" style="visibility:hidden">Back</button>
+                    <button type="button" class="next-btn" id="nextBtn">Next</button>
+                    <button type="submit" class="next-btn" id="submitBtn" style="display:none">Create Business</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var panels = document.querySelectorAll('.wizard-panel');
+            var steps = document.querySelectorAll('.steps .step');
+            var back = document.getElementById('backBtn');
+            var next = document.getElementById('nextBtn');
+            var submit = document.getElementById('submitBtn');
+            var form = document.getElementById('setupForm');
+            var current = 0;
+
+            function show(i) {
+                current = i;
+                panels.forEach(function (p, n) { p.classList.toggle('active', n === i); });
+                steps.forEach(function (s, n) { s.classList.toggle('active', n === i); });
+                back.style.visibility = i === 0 ? 'hidden' : 'visible';
+                next.style.display = i === panels.length - 1 ? 'none' : '';
+                submit.style.display = i === panels.length - 1 ? '' : 'none';
+            }
+
+            function stepOk() {
+                var fields = panels[current].querySelectorAll('input, select');
+                for (var i = 0; i < fields.length; i++) {
+                    if (!fields[i].checkValidity()) { fields[i].reportValidity(); return false; }
+                }
+                if (current === 1 && !form.querySelector('input[name=templateId]:checked')) {
+                    alert('Please pick a template.'); return false;
+                }
+                return true;
+            }
+
+            next.addEventListener('click', function () { if (stepOk()) show(current + 1); });
+            back.addEventListener('click', function () { show(current - 1); });
+
+            document.getElementById('currencyCode').addEventListener('change', function () {
+                var o = this.options[this.selectedIndex];
+                document.getElementById('currencySymbol').value = o.dataset.symbol;
+            });
+
+            form.addEventListener('submit', function (e) {
+                var pw = document.getElementById('password').value;
+                var cf = document.getElementById('confirmPassword').value;
+                var err = document.getElementById('pwError');
+                if (pw !== cf) {
+                    e.preventDefault();
+                    err.textContent = 'The two passwords do not match.';
+                    err.style.display = '';
+                    return;
+                }
+                err.style.display = 'none';
+                for (var i = 0; i < panels.length; i++) {
+                    var fields = panels[i].querySelectorAll('input, select');
+                    for (var j = 0; j < fields.length; j++) {
+                        if (!fields[j].checkValidity()) {
+                            e.preventDefault(); show(i); fields[j].reportValidity(); return;
+                        }
+                    }
+                }
+                if (!form.querySelector('input[name=templateId]:checked')) {
+                    e.preventDefault(); show(1); alert('Please pick a template.');
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

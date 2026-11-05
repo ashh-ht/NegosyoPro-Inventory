@@ -53,25 +53,37 @@ public class ProductAdminController {
     }
 
     @PostMapping
-    public String add(@RequestParam(value = "categoryId") long categoryId, @RequestParam(value = "productCode") String productCode,
-            @RequestParam(value = "productName") String productName, @RequestParam(value = "costPrice") BigDecimal costPrice,
-            @RequestParam(value = "sellingPrice") BigDecimal sellingPrice, @RequestParam(value = "unit") String unit,
+    public String add(@RequestParam(value = "categoryId") long categoryId,
+            @RequestParam(value = "productCode") String productCode,
+            @RequestParam(value = "productName") String productName,
+            @RequestParam(value = "costPrice") BigDecimal costPrice,
+            @RequestParam(value = "sellingPrice") BigDecimal sellingPrice,
+            @RequestParam(value = "unit") String unit,
             @RequestParam(value = "isTaxable", defaultValue = "false") boolean isTaxable,
             @RequestParam(value = "trackInventory", defaultValue = "false") boolean trackInventory,
             @RequestParam(value = "tracksExpiry", defaultValue = "false") boolean tracksExpiry,
             @RequestParam(value = "shelfLifeDays", required = false) Integer shelfLifeDays,
-            @RequestParam(value = "reorderLevel") int reorderLevel, @RequestParam(value = "reorderQuantity") int reorderQuantity,
+            @RequestParam(value = "reorderLevel") int reorderLevel,
+            @RequestParam(value = "reorderQuantity") int reorderQuantity,
             HttpSession session, RedirectAttributes flash) throws SQLException {
         long bid = CurrentUser.get(session).getBusinessId();
 
-        if (productCode != null && productsDAO.getProductByCode(bid, productCode.trim(), false) != null) {
+        if (productCode == null || productCode.isBlank()) {
+            flash.addFlashAttribute("error", "Product code cannot be blank.");
+            return "redirect:/admin/products/new";
+        }
+        if (categoriesDAO.getCategoryById(categoryId, bid) == null) {
+            flash.addFlashAttribute("error", "Category not found.");
+            return "redirect:/admin/products/new";
+        }
+        if (productsDAO.getProductByCode(bid, productCode.trim(), false) != null) {
             flash.addFlashAttribute("error", "A product with code " + productCode + " already exists.");
             return "redirect:/admin/products/new";
         }
         try {
             // New products start at stock 0. Opening stock comes from the restock form.
             catalogService.addProduct(new Products(bid, categoryId,
-                    productCode == null ? null : productCode.trim(), productName, costPrice, sellingPrice,
+                    productCode.trim(), productName, costPrice, sellingPrice,
                     unit, isTaxable, trackInventory, tracksExpiry, shelfLifeDays, reorderLevel,
                     reorderQuantity));
             flash.addFlashAttribute("success", "Product added. Use Restock to add its opening stock.");
@@ -98,19 +110,39 @@ public class ProductAdminController {
 
     @PostMapping("/{id}")
     public String save(@PathVariable("id") long id, @RequestParam(value = "categoryId") long categoryId,
-            @RequestParam(value = "productCode") String productCode, @RequestParam(value = "productName") String productName,
-            @RequestParam(value = "costPrice") BigDecimal costPrice, @RequestParam(value = "sellingPrice") BigDecimal sellingPrice,
+            @RequestParam(value = "productCode") String productCode,
+            @RequestParam(value = "productName") String productName,
+            @RequestParam(value = "costPrice") BigDecimal costPrice,
+            @RequestParam(value = "sellingPrice") BigDecimal sellingPrice,
             @RequestParam(value = "unit") String unit,
             @RequestParam(value = "isTaxable", defaultValue = "false") boolean isTaxable,
             @RequestParam(value = "trackInventory", defaultValue = "false") boolean trackInventory,
             @RequestParam(value = "tracksExpiry", defaultValue = "false") boolean tracksExpiry,
             @RequestParam(value = "shelfLifeDays", required = false) Integer shelfLifeDays,
-            @RequestParam(value = "reorderLevel") int reorderLevel, @RequestParam(value = "reorderQuantity") int reorderQuantity,
+            @RequestParam(value = "reorderLevel") int reorderLevel,
+            @RequestParam(value = "reorderQuantity") int reorderQuantity,
             HttpSession session, RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         Products existing = productsDAO.getProductById(id, bid, false);
         if (existing == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        if (productCode == null || productCode.isBlank()) {
+            flash.addFlashAttribute("error", "Product code cannot be blank.");
+            return "redirect:/admin/products/" + id + "/edit";
+        }
+        if (categoriesDAO.getCategoryById(categoryId, bid) == null) {
+            flash.addFlashAttribute("error", "Category not found.");
+            return "redirect:/admin/products/" + id + "/edit";
+        }
+        // Same guard as add(): product_code is unique per business. The check
+        // excludes the row being edited, so saving without changing the code
+        // stays legal.
+        Products byCode = productsDAO.getProductByCode(bid, productCode.trim(), false);
+        if (byCode != null && byCode.getProductId() != id) {
+            flash.addFlashAttribute("error",
+                    "Another product already uses code " + productCode + ".");
+            return "redirect:/admin/products/" + id + "/edit";
         }
         if (productName == null || productName.isBlank() || costPrice.signum() < 0
                 || sellingPrice.signum() < 0) {
@@ -139,7 +171,8 @@ public class ProductAdminController {
 
     @PostMapping("/{id}/reorder")
     public String updateReorder(@PathVariable("id") long id, @RequestParam(value = "reorderLevel") int reorderLevel,
-            @RequestParam(value = "reorderQuantity") int reorderQuantity, HttpSession session, RedirectAttributes flash) {
+            @RequestParam(value = "reorderQuantity") int reorderQuantity, HttpSession session,
+            RedirectAttributes flash) {
         long bid = CurrentUser.get(session).getBusinessId();
         if (reorderLevel < 0 || reorderQuantity < 0) {
             flash.addFlashAttribute("error", "Reorder numbers cannot be negative.");
