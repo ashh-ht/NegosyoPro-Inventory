@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +20,11 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.inventory.negosyopro.config.CurrentUser;
+import com.inventory.negosyopro.dao.BusinessDAO;
 import com.inventory.negosyopro.dao.ProductsDAO;
 import com.inventory.negosyopro.dao.PurchaseOrdersDAO;
 import com.inventory.negosyopro.dao.SuppliersDAO;
+import com.inventory.negosyopro.model.Business;
 import com.inventory.negosyopro.model.PurchaseOrderItems;
 import com.inventory.negosyopro.model.PurchaseOrders;
 import com.inventory.negosyopro.model.ReceivedItems;
@@ -38,13 +41,26 @@ public class PurchaseOrderAdminController {
     private final PurchaseOrdersDAO purchaseOrdersDAO;
     private final SuppliersDAO suppliersDAO;
     private final ProductsDAO productsDAO;
+    private final BusinessDAO businessDAO;
 
     public PurchaseOrderAdminController(PurchaseOrderService purchaseOrderService,
-            PurchaseOrdersDAO purchaseOrdersDAO, SuppliersDAO suppliersDAO, ProductsDAO productsDAO) {
+            PurchaseOrdersDAO purchaseOrdersDAO, SuppliersDAO suppliersDAO, ProductsDAO productsDAO,
+            BusinessDAO businessDAO) {
         this.purchaseOrderService = purchaseOrderService;
         this.purchaseOrdersDAO = purchaseOrdersDAO;
         this.suppliersDAO = suppliersDAO;
         this.productsDAO = productsDAO;
+        this.businessDAO = businessDAO;
+    }
+
+    // Runs before EVERY handler below (list, new, create, detail, order, cancel,
+    // receive, and the restock
+    // suggestions on the new-order form). Purchase orders off = 404 for all of
+    // them.
+    @ModelAttribute
+    public void requirePurchaseOrders(HttpSession session) {
+        Business business = businessDAO.getBusinessById(CurrentUser.get(session).getBusinessId());
+        CurrentUser.requireModule(business != null && business.isUsesPurchaseOrders());
     }
 
     // ?status=DRAFT|ORDERED|RECEIVED|CANCELLED, or no status for all
@@ -126,7 +142,8 @@ public class PurchaseOrderAdminController {
         long bid = CurrentUser.get(session).getBusinessId();
         try {
             boolean ok = purchaseOrderService.markOrdered(id, bid);
-            flash.addFlashAttribute(ok ? "success" : "error", ok ? "Marked as ordered." : "Could not update the order.");
+            flash.addFlashAttribute(ok ? "success" : "error",
+                    ok ? "Marked as ordered." : "Could not update the order.");
         } catch (IllegalArgumentException | IllegalStateException e) {
             flash.addFlashAttribute("error", e.getMessage());
         }
@@ -146,7 +163,8 @@ public class PurchaseOrderAdminController {
         return "redirect:/admin/purchase-orders/" + id;
     }
 
-    // receivePurchaseOrder takes the USER id. Only an ORDERED order can be received.
+    // receivePurchaseOrder takes the USER id. Only an ORDERED order can be
+    // received.
     @PostMapping("/{id}/receive")
     public String receive(@PathVariable long id,
             @RequestParam(required = false) List<Long> itemId,

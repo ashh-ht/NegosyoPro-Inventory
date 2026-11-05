@@ -115,6 +115,8 @@ public class InventoryAdminController {
     public String writeOff(@PathVariable long batchId, HttpSession session, RedirectAttributes flash)
             throws SQLException {
         Users user = CurrentUser.get(session);
+        Business business = businessDAO.getBusinessById(user.getBusinessId());
+        CurrentUser.requireModule(business != null && business.isUsesExpiry()); // 404 when expiry is off
         try {
             inventoryService.writeOffExpired(batchId, user.getUserId());
             flash.addFlashAttribute("success", "Expired batch written off.");
